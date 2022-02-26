@@ -11,7 +11,7 @@ First deep learning project.
 ### Installation
 
 * Clone the repository
-* In a terminal, navigate to the root of the project and run `pip install requirements.txt`
+* In a terminal, navigate to the root of the project and run `pip install -r requirements.txt`
 * Run the file `config_verification.py` to perform a basic check of your setup
 
 ## Content of the repository
