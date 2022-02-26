@@ -2,7 +2,13 @@
 
 First deep learning project.
 
-## Installation & setup
+## Setup
+
+### Requirements before installation
+
+* CUDA 11.3
+
+### Installation
 
 * Clone the repository
 * In a terminal, navigate to the root of the project and run `pip install requirements.txt`
@@ -12,4 +18,5 @@ First deep learning project.
 
 ### `src` folder
 
-
+* `dlc_practical_prologue.py` - Contains helper functions provided
+* `config_verification.py` - Contains basic checks of your setup

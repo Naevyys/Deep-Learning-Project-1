@@ -8,14 +8,14 @@ import torch
 # Configs
 py_version = "3."  # Change to 3.8 if needed
 torch_version = "1.10.2+cu113"
-torch_Version_strict = True
+torch_version_strict = True
 
 # Check python version
 assert sys.version.startswith(py_version), "This project requires Python " + py_version
 print("Good, you are running Python", py_version)
 
 # Check pytorch version
-if torch_Version_strict:
+if torch_version_strict:
     assert torch.__version__ == torch_version, "You are not using pytorch version  " + torch_version
 else:
     assert torch.__version__ >= torch_version, "You are using a pytorch version below " + torch_version
