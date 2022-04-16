@@ -76,6 +76,10 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb
+
+# For Mac
+.DS_Store
 
 # IPython
 profile_default/
