@@ -72,3 +72,17 @@ def get_logs(path="../outputs/logs/TestNet_SGD_L2_0.01_64_16042022_023735.pth"):
              2nd row the training loss, 3r row validation loss
     """ 
     return torch.load(path) 
+
+def waiting_bar(i, length, loss):
+    """
+        Simple function that prints a progress/waiting bar + the loss
+        :param i: Integer, the current element we are working on
+        :param length: Integer, the total number of elements we need to work on
+        :param loss: Float, The training loss of the system
+        :return: Nothing, just print
+    """
+    left = int(30 * i / length)
+    right = 30 - left
+    tags = "=" * left
+    spaces = " " * right
+    print(f"\r[{tags}>{spaces}] Train loss: {loss[0]:.5f} Val loss: {loss[1]:.5f}", sep="", end="", flush=True)

@@ -3,6 +3,7 @@ import json
 from src.Noise2noise import TestNet
 import src.utils as utils 
 from datetime import datetime
+import time as time
 
 class Model():
     def __init__(self):
@@ -64,6 +65,8 @@ class Model():
         # Maximum number of epochs/iterations 
         n_max = self.params["max_iter"]
 
+        # Monitor time taken
+        start = time.time()
         # The loop on the epochs
         for epoch in range(0, n_max):
             # Shuffle the data set - probably not efficient
@@ -92,7 +95,8 @@ class Model():
                     self.logs[0].append(epoch)
                     self.logs[1].append(criterion(train_pred, train_target))
                     self.logs[2].append(criterion(val_pred, val_target))
-                self.model.train(True) 
+                self.model.train(True)
+                utils.waiting_bar(epoch, n_max, (self.logs[1][-1], self.logs[2][-1]))
         
         # Save the model - path name contains the parameters + date
         date = datetime.now().strftime("%d%m%Y_%H%M%S")
@@ -103,6 +107,13 @@ class Model():
         # Save the logs as well
         self.logs =  torch.tensor(self.logs)
         torch.save(self.logs, self.params["path_logs"]+path)
+
+        # Record and print time 
+        end = time.time()
+        min = (end-start)//60
+        sec = (end-start)%60
+        print("\nTime taken for training: {:.0f} min {:.0f} s".format(min, sec))
+
 
 
     def predict(self, test_input):
