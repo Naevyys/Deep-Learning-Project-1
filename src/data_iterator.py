@@ -54,6 +54,17 @@ class ColorJitter2Img(ColorJitter):
 
         return transformed_img1, transformed_img2
 
+class StandardizeImg(imgs):
+
+    def __call__(self,imgs):
+        """
+        Standardize the tensor of images between 0 and 1.
+        :param imgs: Tensor containing the images
+        :return: Tensor containing the standardized images
+        """
+        assert torch.is_tensor(imgs), "Argument must be a torch tensor"
+        return imgs/255
+
 
 class DataIterator(Dataset):
     def __init__(self, imgs1, imgs2, degrees=0, translate=None, scale=None, fill=0, brightness=0.0, contrast=0.0, saturation=0.0, hue=0.0):
