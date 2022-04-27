@@ -30,20 +30,42 @@ class TestNet(nn.Module):
 
 class Noise2noise(nn.Module):
     """
-    The noise to noise model to implement.  
+    The noise to noise model to implement.
     """
+
     def _init_(self, params):
         super()._init_()
-        self.enc_conv0 = nn.Conv2d(3, 48, kernel_size=3, stride=[1,1,1,1],padding='same')
+        self.enc_conv0 = nn.Conv2d(3, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
         self.enc_conv1 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
+        self.enc_conv2 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
+        self.enc_conv3 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
+        self.enc_conv4 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
+        self.enc_conv5 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
+        self.enc_conv6 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
 
         self.lr = torch.nn.LeakyReLU(0.1)
-        self.mp = torch.nn.MaxPool1d()
+        self.mp = torch.nn.MaxPool1d(kernel_size=[1, 1, 2, 2], stride=[1, 1, 2, 2], padding='same')
 
         raise NotImplementedError
 
     def forward(self, x):
-        
+        x = self.enc_conv0(x)
+        x = self.enc_conv1(x)
+        x = self.mp(x)
+
+        x = self.enc_conv2(x)
+        x = self.mp(x)
+
+        x = self.enc_conv3(x)
+        x = self.mp(x)
+
+        x = self.enc_conv4(x)
+        x = self.mp(x)
+
+        x = self.enc_conv5(x)
+        x = self.mp(x)
+        x = self.enc_conv6(x)
+
         raise NotImplementedError
 
         return x
