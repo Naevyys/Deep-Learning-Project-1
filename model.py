@@ -100,8 +100,9 @@ class Model():
                 +"_"+str(self.params["error"])+"_"+str(self.params["lr"])+"_"+str(self.params["batch_size"])+"_"+date+".pth"
        
         torch.save(self.model, self.params["path_model"]+path)
-        # Save the logs as well 
-        torch.save(torch.tensor(self.logs), self.params["path_logs"]+path)
+        # Save the logs as well
+        self.logs =  torch.tensor(self.logs)
+        torch.save(self.logs, self.params["path_logs"]+path)
 
 
     def predict(self, test_input):
