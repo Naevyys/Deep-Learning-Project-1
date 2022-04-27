@@ -1,3 +1,4 @@
+from ctypes import util
 import torch
 import src.utils 
 from model import Model
@@ -6,6 +7,9 @@ import matplotlib.pyplot as plt
 #Load the images
 noisy_imgs_1, noisy_imgs_2 = torch.load('data/train_data.pkl')
 noisy_imgs , clean_imgs = torch.load('data/val_data.pkl')
+# Send to GPU if available 
+noisy_imgs_1, noisy_imgs_2 = src.utils.to_cuda(noisy_imgs_1), src.utils.to_cuda(noisy_imgs_2)
+noisy_imgs, clean_imgs = src.utils.to_cuda(noisy_imgs), src.utils.to_cuda(clean_imgs)
 # Create the model
 test_model = Model()
 print(test_model.model)
