@@ -78,7 +78,7 @@ def waiting_bar(i, length, loss):
         Simple function that prints a progress/waiting bar + the loss
         :param i: Integer, the current element we are working on
         :param length: Integer, the total number of elements we need to work on
-        :param loss: Float, The training loss of the system
+        :param loss: Tuple(Float, Float), The training and validation loss of the system
         :return: Nothing, just print
     """
     left = int(30 * i / length)
