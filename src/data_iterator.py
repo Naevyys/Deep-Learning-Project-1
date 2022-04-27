@@ -54,16 +54,17 @@ class ColorJitter2Img(ColorJitter):
 
         return transformed_img1, transformed_img2
 
-class StandardizeImg(imgs):
+class StandardizeImg():
 
-    def __call__(self,imgs):
+    def __call__(self,img1, img2):
         """
         Standardize the tensor of images between 0 and 1.
         :param imgs: Tensor containing the images
         :return: Tensor containing the standardized images
         """
-        assert torch.is_tensor(imgs), "Argument must be a torch tensor"
-        return imgs/255
+        assert torch.is_tensor(img1), "Argument must be a torch tensor"
+        assert torch.is_tensor(img2), "Argument must be a torch tensor"
+        return img1/255, img2/255
 
 
 class DataIterator(Dataset):
@@ -120,6 +121,7 @@ class DataIterator(Dataset):
 
         self.affine_transformer = RandomAffine2Img(degrees, translate=translate, scale=scale, fill=fill)
         self.color_transformer = ColorJitter2Img(brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
+        self.standardizer = StandardizeImg()
 
     def __transform_images(self, index):
         """
@@ -135,6 +137,7 @@ class DataIterator(Dataset):
         # Apply transformations
         img1, img2 = self.affine_transformer(img1, img2)
         img1, img2 = self.color_transformer(img1, img2)
+        img1, img2 = self.standardizer(img1, img2)
 
         return img1, img2
 

@@ -4,6 +4,8 @@ from src.Noise2noise import TestNet
 import src.utils as utils 
 from datetime import datetime
 import time as time
+import src.data_iterator as di
+from torch.utils.data import DataLoader 
 
 class Model():
     def __init__(self):
@@ -41,18 +43,31 @@ class Model():
         :param train_target: Train targets.
         :return: None
         """
-
-        # Custom train/validation split - Start by shuffling
+        
+        # Custom train/validation split - Start by shuffling and sending to GPU is available 
         idx = torch.randperm(train_input.size()[0])
-        train_input = train_input[idx,:,:,:]
-        train_target = train_target[idx,:,:,:]
+        train_input = utils.to_cuda(train_input[idx,:,:,:])
+        train_target = utils.to_cuda(train_target[idx,:,:,:]) 
         # Then take the last images as validation set (w.r.t. proportion)
         split = int(self.params["validation"]*train_input.size(0))
-        # Send everything to GPU, if available otherwise stays on CPU
-        val_input  = utils.to_cuda(train_input[split:-1])
-        val_target = utils.to_cuda(train_target[split:-1])
-        train_input = utils.to_cuda(train_input[0:split])
-        train_target = utils.to_cuda(train_target[0:split])
+        # Training data is standardized by the DataLoader 
+        val_input  = train_input[split:-1]/255
+        val_target = train_target[split:-1]/255
+        train_input = train_input[0:split]
+        train_target = train_target[0:split]
+        # Data augmentation and dataloader 
+        # Parameters for augmentation
+        degrees = 180
+        translate = (0.1, 0.1)
+        scale = (0.9, 1.2)
+        brightness = (0.9, 1)
+        contrast = (0.7, 1)
+        saturation = (0.5, 1)
+        hue = (0, 0.4)
+        data_iter = di.DataIterator(train_input, train_target,
+            degrees=degrees, translate=translate, scale=scale, 
+            brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
+        data_loader = DataLoader(data_iter, batch_size=self.params["batch_size"], shuffle=True, num_workers=0)
         
         self.model = utils.to_cuda(self.model)
         # Set the model in train mode
@@ -69,31 +84,22 @@ class Model():
         start = time.time()
         # The loop on the epochs
         for epoch in range(0, n_max):
-            # Shuffle the data set - probably not efficient
-            idx = torch.randperm(train_input.size()[0])
-            train_input = train_input[idx,:,:,:]
-            train_target = train_target[idx,:,:,:]
-
-            mini_batch_size = self.params["batch_size"]
-            # The loop for the mini batches
-            for b in range(0, train_input.size(0), mini_batch_size):
-                # Not a very efficient way to separate the mini batches
-                # But does the job
-                if b+mini_batch_size<train_input.size(0):
-                    output = self.model(train_input.narrow(0, b, mini_batch_size))
-                    loss = criterion(output, train_target.narrow(0, b, mini_batch_size))
-                    self.model.zero_grad()
-                    loss.backward()
-                    optimizer.step()
+            for batch_id, train_data in enumerate(data_loader):
+                train_img, target_img = train_data
+                output = self.model(train_img)
+                loss = criterion(output, target_img)
+                self.model.zero_grad()
+                loss.backward()
+                optimizer.step()
             
             # Evaluate the model every eval_step
             if (epoch+1)%self.params["eval_step"]==0:
                 self.model.train(False)
                 with torch.no_grad():
-                    train_pred = self.model(train_input)
+                    train_pred = self.model(train_input/255)
                     val_pred = self.model(val_input)
                     self.logs[0].append(epoch)
-                    self.logs[1].append(criterion(train_pred, train_target))
+                    self.logs[1].append(criterion(train_pred, train_target/255))
                     self.logs[2].append(criterion(val_pred, val_target))
                 self.model.train(True)
                 utils.waiting_bar(epoch, n_max, (self.logs[1][-1], self.logs[2][-1]))

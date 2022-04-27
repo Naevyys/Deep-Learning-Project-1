@@ -16,7 +16,7 @@ print(test_model.model)
 # Train the model
 # Normalize between 0 and 1 like this because Iris 
 # wants to use branches and hasn't uploaded here data transform yet
-test_model.train(noisy_imgs_1[0:1000,:,:,:]/256, noisy_imgs_2[0:1000,:,:,:]/256)
+test_model.train(noisy_imgs_1[0:1000,:,:,:], noisy_imgs_2[0:1000,:,:,:])
 print("Successful training!")
 # Plot the results 
 plt.plot(test_model.logs[0].cpu(),test_model.logs[1].cpu(), label="Train loss")
