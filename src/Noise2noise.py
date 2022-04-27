@@ -32,9 +32,14 @@ class Noise2noise(nn.Module):
     """
     The noise to noise model to implement.  
     """
-    def __init__(self, params):
-        super().__init__()
-        
+    def _init_(self, params):
+        super()._init_()
+        self.enc_conv0 = nn.Conv2d(3, 48, kernel_size=3, stride=[1,1,1,1],padding='same')
+        self.enc_conv1 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
+
+        self.lr = torch.nn.LeakyReLU(0.1)
+        self.mp = torch.nn.MaxPool1d()
+
         raise NotImplementedError
 
     def forward(self, x):
