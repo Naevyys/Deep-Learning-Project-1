@@ -44,17 +44,20 @@ class Model():
         :return: None
         """
         
+        device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+        print("You are using the device: "+str(device))
+
         # Custom train/validation split - Start by shuffling and sending to GPU is available 
         idx = torch.randperm(train_input.size()[0])
-        train_input = utils.to_cuda(train_input[idx,:,:,:])
-        train_target = utils.to_cuda(train_target[idx,:,:,:]) 
+        train_input = train_input[idx,:,:,:]
+        train_target = train_target[idx,:,:,:]
         # Then take the last images as validation set (w.r.t. proportion)
         split = int(self.params["validation"]*train_input.size(0))
         # Training data is standardized by the DataLoader 
-        val_input  = train_input[split:-1]/255
-        val_target = train_target[split:-1]/255
-        train_input = train_input[0:split]
-        train_target = train_target[0:split]
+        val_input  = (train_input[split:-1]/255).to(device)
+        val_target = (train_target[split:-1]/255).to(device)
+        train_input = (train_input[0:split]).to(device)
+        train_target = (train_target[0:split]).to(device)
         # Data augmentation and dataloader 
         # Parameters for augmentation
         degrees = 180
@@ -69,7 +72,7 @@ class Model():
             brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
         data_loader = DataLoader(data_iter, batch_size=self.params["batch_size"], shuffle=True, num_workers=0)
         
-        self.model = utils.to_cuda(self.model)
+        self.model = self.model.to(device)
         # Set the model in train mode
         self.model.train(True)
 
@@ -84,8 +87,9 @@ class Model():
         start = time.time()
         # The loop on the epochs
         for epoch in range(0, n_max):
-            for batch_id, train_data in enumerate(data_loader):
-                train_img, target_img = train_data
+            for train_img, target_img in data_loader:
+                #train_img, target_img = train_data
+                print(train_img.device, target_img.device)
                 output = self.model(train_img)
                 loss = criterion(output, target_img)
                 self.model.zero_grad()
