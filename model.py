@@ -88,8 +88,6 @@ class Model():
         # The loop on the epochs
         for epoch in range(0, n_max):
             for train_img, target_img in data_loader:
-                #train_img, target_img = train_data
-                print(train_img.device, target_img.device)
                 output = self.model(train_img)
                 loss = criterion(output, target_img)
                 self.model.zero_grad()
