@@ -1,17 +1,19 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-#from src.utils import utils
+# from src.utils import utils
 import json
+
 
 class TestNet(nn.Module):
     """
     Dummy network, without batchnorm, maxpool etc.
     Just a test with two convolutions and one upsample. 
     """
+
     def __init__(self, params):
         super().__init__()
-    
+
         self.img_ch = params["img_channel"]
         self.h = params["height"]
         self.w = params["width"]
@@ -28,6 +30,7 @@ class TestNet(nn.Module):
         x = self.sig(x)
         return x
 
+
 class Noise2noise(nn.Module):
     """
     The noise to noise model to implement.
@@ -35,37 +38,93 @@ class Noise2noise(nn.Module):
 
     def _init_(self, params):
         super()._init_()
-        self.enc_conv0 = nn.Conv2d(3, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
-        self.enc_conv1 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
-        self.enc_conv2 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
-        self.enc_conv3 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
-        self.enc_conv4 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
-        self.enc_conv5 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
-        self.enc_conv6 = nn.Conv2d(48, 48, kernel_size=3, stride=[1, 1, 1, 1], padding='same')
+
+        self.img_ch = params["img_channel"]
+        self.h = params["height"]
+        self.w = params["width"]
+
+        self.enc_conv0 = nn.Conv2d(self.h, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.enc_conv1 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.enc_conv2 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.enc_conv3 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.enc_conv4 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.enc_conv5 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.enc_conv6 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv5a = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv5b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv4a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv4b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv3a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv3b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv2a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv2b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv1a = nn.Conv2d(96+self.h, 64,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv1b = nn.Conv2d(64, 32,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
+        self.dec_conv1 = nn.Conv2d(32, self.h)
 
         self.lr = torch.nn.LeakyReLU(0.1)
         self.mp = torch.nn.MaxPool1d(kernel_size=[1, 1, 2, 2], stride=[1, 1, 2, 2], padding='same')
 
         raise NotImplementedError
 
+    def upscale2d(self, x):
+        factor = 2
+        s = x.shape
+        x = torch.reshape(x, [-1, s[1], s[2], 1, s[3], 1])
+        x = torch.tile(x, [1, 1, 1, factor, 1, factor])
+        x = torch.reshape(x, [-1, s[1], s[2] * factor, s[3] * factor])
+        return x
+
     def forward(self, x):
-        x = self.enc_conv0(x)
-        x = self.enc_conv1(x)
-        x = self.mp(x)
 
-        x = self.enc_conv2(x)
-        x = self.mp(x)
+        skips = [x]
 
-        x = self.enc_conv3(x)
+        x = self.lr(self.enc_conv0(x))
+        x = self.lr(self.enc_conv1(x))
         x = self.mp(x)
+        skips.append(x)
 
-        x = self.enc_conv4(x)
+        x = self.lr(self.enc_conv2(x))
         x = self.mp(x)
+        skips.append(x)
 
-        x = self.enc_conv5(x)
+        x = self.lr(self.enc_conv3(x))
         x = self.mp(x)
-        x = self.enc_conv6(x)
+        skips.append(x)
 
-        raise NotImplementedError
+        x = self.lr(self.enc_conv4(x))
+        x = self.mp(x)
+        skips.append(x)
+
+        x = self.lr(self.enc_conv5(x))
+        x = self.mp(x)
+        x = self.lr(self.enc_conv6(x))
+
+        x = self.upscale2d(x)
+        x = torch.concat([x, skips.pop()], dim=1)
+        x = self.lr(self.dec_conv5a(x))
+        x = self.lr(self.dec_conv5b(x))
+
+        x = self.upscale2d(x)
+        x = torch.concat([x, skips.pop()], dim=1)
+        x = self.lr(self.dec_conv4a(x))
+        x = self.lr(self.dec_conv4b(x))
+
+        x = self.upscale2d(x)
+        x = torch.concat([x, skips.pop()], dim=1)
+        x = self.lr(self.dec_conv3a(x))
+        x = self.lr(self.dec_conv3b(x))
+
+        x = self.upscale2d(x)
+        x = torch.concat([x, skips.pop()], dim=1)
+        x = self.lr(self.dec_conv2a(x))
+        x = self.lr(self.dec_conv2b(x))
+
+        x = self.upscale2d(x)
+        x = torch.concat([x, skips.pop()], dim=1)
+        x = self.lr(self.dec_conv1a(x))
+        x = self.lr(self.dec_conv2b(x))
+
+        x = self.dec_conv1(x)
 
         return x
