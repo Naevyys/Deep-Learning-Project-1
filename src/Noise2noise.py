@@ -36,36 +36,35 @@ class Noise2noise(nn.Module):
     The noise to noise model to implement.
     """
 
-    def _init_(self, params):
-        super()._init_()
+    def __init__(self, params):
+        super().__init__()
 
         self.img_ch = params["img_channel"]
         self.h = params["height"]
         self.w = params["width"]
 
-        self.enc_conv0 = nn.Conv2d(self.h, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.enc_conv1 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.enc_conv2 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.enc_conv3 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.enc_conv4 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.enc_conv5 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.enc_conv6 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv5a = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv5b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv4a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv4b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv3a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv3b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv2a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv2b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv1a = nn.Conv2d(96+self.h, 64,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv1b = nn.Conv2d(64, 32,kernel_size=3, stride=(1, 1, 1, 1), padding='same')
-        self.dec_conv1 = nn.Conv2d(32, self.h)
+        self.enc_conv0 = nn.Conv2d(self.img_ch, 48, kernel_size=3, stride=(1, 1), padding='same')
+        self.enc_conv1 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1), padding='same')
+        self.enc_conv2 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1), padding='same')
+        self.enc_conv3 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1,), padding='same')
+        self.enc_conv4 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1), padding='same')
+        self.enc_conv5 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1,), padding='same')
+        self.enc_conv6 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv5a = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv5b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv4a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv4b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv3a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv3b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv2a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv2b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1a = nn.Conv2d(96+self.img_ch, 64,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1b = nn.Conv2d(64, 32,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1 = nn.Conv2d(32, self.img_ch,kernel_size=3, stride=(1, 1), padding='same')
 
         self.lr = torch.nn.LeakyReLU(0.1)
-        self.mp = torch.nn.MaxPool1d(kernel_size=[1, 1, 2, 2], stride=[1, 1, 2, 2], padding='same')
+        self.mp = torch.nn.MaxPool2d(kernel_size=(3, 3), stride=(2, 2), padding=1)
 
-        raise NotImplementedError
 
     def upscale2d(self, x):
         factor = 2
@@ -101,6 +100,7 @@ class Noise2noise(nn.Module):
         x = self.lr(self.enc_conv6(x))
 
         x = self.upscale2d(x)
+
         x = torch.concat([x, skips.pop()], dim=1)
         x = self.lr(self.dec_conv5a(x))
         x = self.lr(self.dec_conv5b(x))
@@ -121,9 +121,12 @@ class Noise2noise(nn.Module):
         x = self.lr(self.dec_conv2b(x))
 
         x = self.upscale2d(x)
+
         x = torch.concat([x, skips.pop()], dim=1)
+
         x = self.lr(self.dec_conv1a(x))
-        x = self.lr(self.dec_conv2b(x))
+
+        x = self.lr(self.dec_conv1b(x))
 
         x = self.dec_conv1(x)
 
