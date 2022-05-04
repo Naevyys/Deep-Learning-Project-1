@@ -104,10 +104,10 @@ class Model():
             if (epoch+1)%self.params["eval_step"]==0:
                 self.model.train(False)
                 with torch.no_grad():
-                    train_pred = self.model(train_input/255)
+                    train_pred = self.model(train_input_augmented)
                     val_pred = self.model(val_input)
                     self.logs[0].append(epoch)
-                    self.logs[1].append(criterion(train_pred, train_target/255))
+                    self.logs[1].append(criterion(train_pred, train_target_augmented))
                     self.logs[2].append(criterion(val_pred, val_target))
                 self.model.train(True)
                 utils.waiting_bar(epoch, n_max, (self.logs[1][-1], self.logs[2][-1]))
@@ -127,6 +127,7 @@ class Model():
         min = (end-start)//60
         sec = (end-start)%60
         print("\nTime taken for training: {:.0f} min {:.0f} s".format(min, sec))
+        del train_input_augmented, train_target_augmented, train_input, train_target
 
 
 

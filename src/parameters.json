@@ -4,7 +4,7 @@
     "error": "L2",
     "lr": 1e-3,
     "batch_size": 64, 
-    "max_iter": 100,
+    "max_iter": 20,
     "img_channel": 3,
     "height": 32,
     "width": 32,

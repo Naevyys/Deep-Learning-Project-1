@@ -27,7 +27,7 @@ plt.title(test_model.params["model"])
 plt.legend() 
 plt.show()
 # Test the model 
-predictions = test_model.predict(noisy_imgs/256)
+predictions = test_model.predict(noisy_imgs/255)
 # Test the PNSR 
 pnsr = test_model.psnr(predictions, clean_imgs)
 print("The psnr is: %f"%pnsr)
