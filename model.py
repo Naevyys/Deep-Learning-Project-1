@@ -70,7 +70,9 @@ class Model():
         data_iter = di.DataIterator(train_input, train_target,
             degrees=degrees, translate=translate, scale=scale, 
             brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
-        data_loader = DataLoader(data_iter, batch_size=self.params["batch_size"], shuffle=True, num_workers=0)
+        train_input_augmented, train_target_augmented = data_iter[:]
+        nb_images = len(data_iter)
+        #data_loader = DataLoader(data_iter, batch_size=self.params["batch_size"], shuffle=True, num_workers=0)
         
         self.model = self.model.to(device)
         # Set the model in train mode
@@ -87,7 +89,10 @@ class Model():
         start = time.time()
         # The loop on the epochs
         for epoch in range(0, n_max):
-            for train_img, target_img in data_loader:
+            idx = torch.randperm(nb_images)
+            # Shuffle the dataset at each epoch
+            train_input_augmented, train_target_augmented = train_input_augmented[idx, :, :, :], train_target_augmented[idx, :, :, :]
+            for train_img, target_img in zip(torch.split(train_input_augmented, self.params["batch_size"]),torch.split(train_target_augmented,self.params["batch_size"])):
                 train_img, target_img = train_img.to(device), target_img.to(device)
                 output = self.model(train_img)
                 loss = criterion(output, target_img)

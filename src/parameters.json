@@ -1,8 +1,8 @@
 {
-    "model": "TestNet",
+    "model": "Noise2noise",
     "opti_type": "SGD",
     "error": "L2",
-    "lr": 1e-2,
+    "lr": 1e-3,
     "batch_size": 64, 
     "max_iter": 100,
     "img_channel": 3,
