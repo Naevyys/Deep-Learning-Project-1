@@ -54,10 +54,10 @@ class Model():
         # Then take the last images as validation set (w.r.t. proportion)
         split = int(self.params["validation"]*train_input.size(0))
         # Training data is standardized by the DataLoader 
-        val_input  = (train_input[split:-1]/255).to(device)
-        val_target = (train_target[split:-1]/255).to(device)
-        train_input = (train_input[0:split]).to(device)
-        train_target = (train_target[0:split]).to(device)
+        val_input  = (train_input[0:split]/255)
+        val_target = (train_target[0:split]/255)
+        train_input = (train_input[split:-1])
+        train_target = (train_target[split:-1])
         # Data augmentation and dataloader 
         # Parameters for augmentation
         degrees = 180
@@ -104,11 +104,20 @@ class Model():
             if (epoch+1)%self.params["eval_step"]==0:
                 self.model.train(False)
                 with torch.no_grad():
-                    train_pred = self.model(train_input_augmented)
-                    val_pred = self.model(val_input)
+                    eva_batch_size = 1000
+                    train_error = 0
+                    val_error = 0
+                    for train_img in torch.split(train_input_augmented, eva_batch_size):
+                        train_img = train_img.to(device)
+                        train_error += criterion(self.model(train_img), train_img)
+                    for val_img in torch.split(val_input, eva_batch_size):
+                        val_img = val_img.to(device)
+                        val_error += criterion(self.model(val_img), val_img)
+                    train_error = train_error/train_input_augmented.shape[0]
+                    val_error = val_error / val_img.shape[0]
                     self.logs[0].append(epoch)
-                    self.logs[1].append(criterion(train_pred, train_target_augmented))
-                    self.logs[2].append(criterion(val_pred, val_target))
+                    self.logs[1].append(train_error)
+                    self.logs[2].append(val_error)
                 self.model.train(True)
                 utils.waiting_bar(epoch, n_max, (self.logs[1][-1], self.logs[2][-1]))
         
