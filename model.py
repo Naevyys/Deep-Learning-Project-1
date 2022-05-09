@@ -5,7 +5,9 @@ import src.utils as utils
 from datetime import datetime
 import time as time
 import src.data_iterator as di
-from torch.utils.data import DataLoader 
+from torch.utils.data import DataLoader
+
+import matplotlib.pyplot as plt
 
 class Model():
     def __init__(self):
@@ -85,6 +87,13 @@ class Model():
         # Maximum number of epochs/iterations 
         n_max = self.params["max_iter"]
 
+        # print(train_input_augmented.dtype)
+        # fig, ax = plt.subplots(1,2)
+        #
+        # ax[0].imshow(train_input_augmented[0].numpy().transpose((1, 2, 0)))  # Original images
+        # ax[1].imshow(train_target_augmented[0].numpy().transpose((1, 2, 0)))
+        # plt.show()
+
         # Monitor time taken
         start = time.time()
         # The loop on the epochs
@@ -99,39 +108,49 @@ class Model():
                 self.model.zero_grad()
                 loss.backward()
                 optimizer.step()
-            
+
             # Evaluate the model every eval_step
             if (epoch+1)%self.params["eval_step"]==0:
                 self.model.train(False)
                 with torch.no_grad():
                     eva_batch_size = 1000
-                    train_error = 0
-                    val_error = 0
-                    for train_img in torch.split(train_input_augmented, eva_batch_size):
+                    train_error = 0.
+                    val_error = 0.
+                    train_zip = zip(torch.split(train_input_augmented, eva_batch_size),torch.split(train_target_augmented, eva_batch_size))
+                    val_zip = zip(torch.split(val_input, eva_batch_size), torch.split(val_target, eva_batch_size))
+                    nb_split_train = len(list(train_zip))
+                    nb_split_val = len(list(val_zip))
+
+                    train_zip = zip(torch.split(train_input_augmented, eva_batch_size), torch.split(train_target_augmented, eva_batch_size))
+                    val_zip = zip(torch.split(val_input, eva_batch_size), torch.split(val_target, eva_batch_size))
+
+                    for train_img, target_img in train_zip:
                         train_img = train_img.to(device)
-                        train_error += criterion(self.model(train_img), train_img)
-                    for val_img in torch.split(val_input, eva_batch_size):
+                        target_img = target_img.to(device)
+                        train_error += criterion(self.model(train_img), target_img)
+                    for val_img, val_img_target in val_zip:
                         val_img = val_img.to(device)
-                        val_error += criterion(self.model(val_img), val_img)
-                    train_error = train_error/train_input_augmented.shape[0]
-                    val_error = val_error / val_img.shape[0]
+                        val_img_target = val_img_target.to(device)
+                        val_error += criterion(self.model(val_img), val_img_target)
+                    train_error = train_error / nb_split_train
+                    val_error = val_error / nb_split_val
                     self.logs[0].append(epoch)
                     self.logs[1].append(train_error)
                     self.logs[2].append(val_error)
                 self.model.train(True)
                 utils.waiting_bar(epoch, n_max, (self.logs[1][-1], self.logs[2][-1]))
-        
+
         # Save the model - path name contains the parameters + date
         date = datetime.now().strftime("%d%m%Y_%H%M%S")
         path = self.params["model"]+"_"+self.params["opti_type"] \
                 +"_"+str(self.params["error"])+"_"+str(self.params["lr"])+"_"+str(self.params["batch_size"])+"_"+date+".pth"
-       
+
         torch.save(self.model, self.params["path_model"]+path)
         # Save the logs as well
         self.logs =  torch.tensor(self.logs)
         torch.save(self.logs, self.params["path_logs"]+path)
 
-        # Record and print time 
+        # Record and print time
         end = time.time()
         min = (end-start)//60
         sec = (end-start)%60

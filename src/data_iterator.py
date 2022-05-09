@@ -33,7 +33,8 @@ class ColorJitter2Img(ColorJitter):
         """
 
         # Get random parameters
-        order, brightness, contrast, saturation, hue = self.get_params(self.brightness, self.contrast, self.saturation, self.hue)
+        order, brightness, contrast, saturation, hue = self.get_params(self.brightness, self.contrast, self.saturation,
+                                                                       self.hue)
 
         # Transform images
         transformed_img1 = img1
@@ -54,9 +55,10 @@ class ColorJitter2Img(ColorJitter):
 
         return transformed_img1, transformed_img2
 
+
 class StandardizeImg():
 
-    def __call__(self,img1, img2):
+    def __call__(self, img1, img2):
         """
         Standardize the tensor of images between 0 and 1.
         :param imgs: Tensor containing the images
@@ -64,11 +66,12 @@ class StandardizeImg():
         """
         assert torch.is_tensor(img1), "Argument must be a torch tensor"
         assert torch.is_tensor(img2), "Argument must be a torch tensor"
-        return img1/255, img2/255
+        return img1 / 255, img2 / 255
 
 
 class DataIterator(Dataset):
-    def __init__(self, imgs1, imgs2, degrees=0, translate=None, scale=None, fill=0, brightness=0.0, contrast=0.0, saturation=0.0, hue=0.0):
+    def __init__(self, imgs1, imgs2, degrees=0, translate=None, scale=None, fill=0, brightness=0.0, contrast=0.0,
+                 saturation=0.0, hue=0.0):
         """
         Initializes a data iterator for our data.
         :param imgs1: Tensor of first images.
@@ -95,7 +98,7 @@ class DataIterator(Dataset):
         assert isinstance(imgs1, torch.Tensor) and isinstance(imgs2, torch.Tensor), "Images must be tensors!"
         assert imgs1.size() == imgs2.size(), "Tensors of first and second images must have the same size!"
         assert isinstance(degrees, int) or isinstance(degrees, tuple) and len(degrees) == 2 \
-            and isinstance(degrees[0], int) and isinstance(degrees[1], int), \
+               and isinstance(degrees[0], int) and isinstance(degrees[1], int), \
             "Degrees must be an integer or a list of integers"
         assert isinstance(translate, tuple) and len(translate) == 2 and 0 <= translate[0] <= 1 \
                and 0 <= translate[1] <= 1 or translate is None, "Translate must be a tuple of size 2 with values in " \
@@ -105,22 +108,23 @@ class DataIterator(Dataset):
         assert isinstance(fill, int), "Fill value must be an integer"
         assert isinstance(brightness, tuple) and brightness[0] >= 0 and brightness[1] >= 0 \
                or brightness >= 0 and (isinstance(brightness, float) or isinstance(brightness, int)), \
-               "Brightness must be a float or tuple of two floats with non-negative value(s)."
+            "Brightness must be a float or tuple of two floats with non-negative value(s)."
         assert isinstance(contrast, tuple) and contrast[0] >= 0 and contrast[1] >= 0 \
                or contrast >= 0 and (isinstance(contrast, float) or isinstance(contrast, int)), \
-               "Contrast must be a float or tuple of two floats with non-negative value(s)."
+            "Contrast must be a float or tuple of two floats with non-negative value(s)."
         assert isinstance(saturation, tuple) and saturation[0] >= 0 and saturation[1] >= 0 \
                or saturation >= 0 and (isinstance(saturation, float) or isinstance(saturation, int)), \
-               "Saturation must be a float or tuple of two floats with non-negative value(s)."
+            "Saturation must be a float or tuple of two floats with non-negative value(s)."
         assert isinstance(hue, tuple) and -0.5 <= hue[0] <= 0.5 and -0.5 <= hue[1] <= 0.5 \
                or 0 <= hue <= 0.5 and (isinstance(hue, float) or isinstance(hue, int)), \
-               "Hue must be a float in [0, 0.5] or a tuple of two floats in [-0.5, 0.5]."
+            "Hue must be a float in [0, 0.5] or a tuple of two floats in [-0.5, 0.5]."
 
         self.imgs1 = imgs1
         self.imgs2 = imgs2
 
         self.affine_transformer = RandomAffine2Img(degrees, translate=translate, scale=scale, fill=fill)
-        self.color_transformer = ColorJitter2Img(brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
+        self.color_transformer = ColorJitter2Img(brightness=brightness, contrast=contrast, saturation=saturation,
+                                                 hue=hue)
         self.standardizer = StandardizeImg()
 
     def __transform_images(self, index):
@@ -135,8 +139,8 @@ class DataIterator(Dataset):
         img2 = self.imgs2[index]
 
         # Apply transformations
-        img1, img2 = self.affine_transformer(img1, img2)
-        img1, img2 = self.color_transformer(img1, img2)
+        # img1, img2 = self.affine_transformer(img1, img2)
+        # img1, img2 = self.color_transformer(img1, img2)
         img1, img2 = self.standardizer(img1, img2)
 
         return img1, img2
