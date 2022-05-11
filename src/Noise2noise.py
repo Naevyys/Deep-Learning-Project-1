@@ -64,14 +64,15 @@ class Noise2noise(nn.Module):
 
         self.lre = torch.nn.LeakyReLU(0.1)
         self.mp = torch.nn.MaxPool2d(kernel_size=(3, 3), stride=(2, 2), padding=1)
+        self.upscale2d = nn.Upsample(scale_factor=2, mode='nearest')
 
-    def upscale2d(self, x):
-        factor = 2
-        s = x.shape
-        x = torch.reshape(x, [-1, s[1], s[2], 1, s[3], 1])
-        x = torch.tile(x, [1, 1, 1, factor, 1, factor])
-        x = torch.reshape(x, [-1, s[1], s[2] * factor, s[3] * factor])
-        return x
+    # def upscale2d(self, x):
+    #     factor = 2
+    #     s = x.shape
+    #     x = torch.reshape(x, [-1, s[1], s[2], 1, s[3], 1])
+    #     x = torch.tile(x, [1, 1, 1, factor, 1, factor])
+    #     x = torch.reshape(x, [-1, s[1], s[2] * factor, s[3] * factor])
+    #     return x
 
     def forward(self, x):
 
