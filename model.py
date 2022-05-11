@@ -1,11 +1,11 @@
 import torch
 import json
-from src.Noise2noise import TestNet
-import src.utils as utils 
 from datetime import datetime
 import time as time
-import src.data_iterator as di
+from .src import utils 
+from .src import data_iterator as di
 from torch.utils.data import DataLoader
+
 
 import matplotlib.pyplot as plt
 
@@ -17,7 +17,8 @@ class Model():
         """
 
         # Not very pretty in constructor, but best solution so far. 
-        with open("src/parameters.json", "r") as read_file:
+        #with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
+        with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
             self.params = json.load(read_file)
         
         # Loads the model that we want to train, according to the config file 
@@ -38,7 +39,7 @@ class Model():
         """
         self.best_model = torch.load(self.params["path_model"]+self.params["best_model"])
 
-    def train(self, train_input, train_target):
+    def train(self, train_input, train_target, num_epochs=None):
         """
         Trains the model.
         :param train_input: Training data.
@@ -84,8 +85,9 @@ class Model():
         optimizer = utils.get_optimizer(self.model, self.params["opti_type"],self.params["lr"])
         # The error function 
         criterion = utils.get_loss(self.params["error"])
-        # Maximum number of epochs/iterations 
-        n_max = self.params["max_iter"]
+        # Maximum number of epochs/iterations
+        if num_epochs is None: 
+            num_epochs = self.params["max_iter"]
 
         # print(train_input_augmented.dtype)
         # fig, ax = plt.subplots(1,2)
@@ -97,7 +99,7 @@ class Model():
         # Monitor time taken
         start = time.time()
         # The loop on the epochs
-        for epoch in range(0, n_max):
+        for epoch in range(0, num_epochs):
             idx = torch.randperm(nb_images)
             # Shuffle the dataset at each epoch
             train_input_augmented, train_target_augmented = train_input_augmented[idx, :, :, :], train_target_augmented[idx, :, :, :]
@@ -167,7 +169,11 @@ class Model():
         """
         # Set the model in testing mode
         self.model.train(False)
-        return self.model(test_input)
+        out = self.model(test_input.float()/255.0)
+        min = out.min()
+        max = out.max()-min
+        
+        return ((out - min ) / (max))*255
 
     def psnr(self, denoised, ground_truth):
         """
