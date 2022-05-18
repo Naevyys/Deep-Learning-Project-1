@@ -1,16 +1,16 @@
 {
     "model": "Noise2noise",
-    "opti_type": "SGD",
-    "error": "L1",
-    "lr": 3e-3,
+    "opti_type": "ADA",
+    "error": "HU",
+    "lr": 5e-3,
     "batch_size":64,
-    "max_iter": 5,
+    "max_iter": 25,
     "img_channel": 3,
     "height": 32,
     "width": 32,
     "path_model": "Proj_287452_337635_288228/Miniproject_1/outputs/trained_models/", 
     "path_logs": "Proj_287452_337635_288228/Miniproject_1/outputs/logs/",
-    "best_model": "Noise2noise_SGD_L1_0.003_64_11052022_150014.pth",
+    "best_model": "Noise2noise_SGD_L1_0.005_64_17052022_014119.pth",
     "validation": 0.2,
-    "eval_step": 10
+    "eval_step": 5
 }

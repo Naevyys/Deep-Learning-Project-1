@@ -47,6 +47,8 @@ def get_loss(type="L2"):
         return torch.nn.MSELoss()
     elif type == "L1": 
         return torch.nn.L1Loss()
+    elif type == 'HU':
+        return torch.nn.HuberLoss()
     raise Exception("Sorry, we could not find the error function.") 
 
 def get_model(params):

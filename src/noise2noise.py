@@ -63,16 +63,10 @@ class Noise2noise(nn.Module):
         self.dec_conv1 = nn.Conv2d(32, self.img_ch,kernel_size=3, stride=(1, 1), padding='same')
 
         self.lre = torch.nn.LeakyReLU(0.1)
+        self.relu = torch.nn.ReLU()
+        self.hsig = torch.nn.Hardsigmoid()
         self.mp = torch.nn.MaxPool2d(kernel_size=(3, 3), stride=(2, 2), padding=1)
         self.upscale2d = nn.Upsample(scale_factor=2, mode='nearest')
-
-    # def upscale2d(self, x):
-    #     factor = 2
-    #     s = x.shape
-    #     x = torch.reshape(x, [-1, s[1], s[2], 1, s[3], 1])
-    #     x = torch.tile(x, [1, 1, 1, factor, 1, factor])
-    #     x = torch.reshape(x, [-1, s[1], s[2] * factor, s[3] * factor])
-    #     return x
 
     def forward(self, x):
 
@@ -95,13 +89,14 @@ class Noise2noise(nn.Module):
         x = self.mp(x)
         skips.append(x)
 
-        x = self.lre(self.enc_conv5(x))
-        x = self.mp(x)
-        x = self.lre(self.enc_conv6(x))
-
-        x = self.upscale2d(x)
+        # x = self.lre(self.enc_conv5(x))
+        # x = self.mp(x)
+        # x = self.lre(self.enc_conv6(x))
+        #
+        # x = self.upscale2d(x)
 
         x = torch.concat([x, skips.pop()], dim=1)
+
         x = self.lre(self.dec_conv5a(x))
         x = self.lre(self.dec_conv5b(x))
 
@@ -128,6 +123,6 @@ class Noise2noise(nn.Module):
 
         x = self.lre(self.dec_conv1b(x))
 
-        x = self.dec_conv1(x)
+        x = self.hsig(self.dec_conv1(x))
 
         return x

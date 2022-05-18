@@ -2,7 +2,7 @@ import torch
 import json
 from datetime import datetime
 import time as time
-from .src import utils 
+from .src import utils
 from .src import data_iterator as di
 
 
@@ -13,19 +13,19 @@ class Model():
         :return: None
         """
 
-        # Not very pretty in constructor, but best solution so far. 
-        #with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
+        # Not very pretty in constructor, but best solution so far.
+        # with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
         with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
             self.params = json.load(read_file)
 
-        # Loads the model that we want to train, according to the config file 
+        # Loads the model that we want to train, according to the config file
         self.model = utils.get_model(self.params)
         # Loads the best model with pre-trained weights
-        # TODO 
+        # TODO
         self.best_model = None
-        # To store the training logs 
+        # To store the training logs
         # First row: the epoch number
-        # Second row: the training error 
+        # Second row: the training error
         # Third row: the validation error
         self.logs = [[], [], []]
 
@@ -41,27 +41,31 @@ class Model():
         Trains the model.
         :param train_input: Training data.
         :param train_target: Train targets.
+        :param num_epochs: number of epochs
         :return: None
         """
 
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         print("You are using the device: " + str(device))
 
-        # Custom train/validation split - Start by shuffling and sending to GPU is available 
+        # Custom train/validation split - Start by shuffling and sending to GPU is available
         idx = torch.randperm(train_input.size()[0])
         train_input = train_input[idx, :, :, :]
         train_target = train_target[idx, :, :, :]
         # Then take the last images as validation set (w.r.t. proportion)
         split = int(self.params["validation"] * train_input.size(0))
-        # Training data is standardized by the DataLoader 
+        # Training data is standardized by the DataLoader
         val_input = (train_input[0:split] / 255)
         val_target = (train_target[0:split] / 255)
         train_input = (train_input[split:-1])
         train_target = (train_target[split:-1])
+
+        num_shuffle = 4  # rate of dataset and data augmentation shuffling
+
         # Data augmentation
 
         # Parameters for augmentation
-        probability = 0.5
+        probability = 0.2
         brightness = (0.9, 1)
         contrast = (0.7, 1)
         saturation = (0.5, 1)
@@ -70,9 +74,10 @@ class Model():
         data_iter = di.DataIterator(train_input, train_target, prob=probability,
                                     brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
 
+        train_input_augmented, train_target_augmented = data_iter[:]
+
         nb_images_train = len(data_iter)
         nb_images_val = len(val_input)
-
 
         self.model = self.model.to(device)
         # Set the model in train mode
@@ -80,19 +85,22 @@ class Model():
 
         # Initialize optimizer
         optimizer = utils.get_optimizer(self.model, self.params["opti_type"], self.params["lr"])
-        # The error function 
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.2)
+
+        # The error function
         criterion = utils.get_loss(self.params["error"])
         # Maximum number of epochs/iterations
-        if num_epochs is None: 
+        if num_epochs is None:
             num_epochs = self.params["max_iter"]
 
         # Monitor time taken
         start = time.time()
         # The loop on the epochs
         for epoch in range(0, num_epochs):
+            if epoch % num_shuffle == 0:
+                train_input_augmented, train_target_augmented = data_iter[:]
             idx = torch.randperm(nb_images_train)
-            # Shuffle the dataset at each epoch TODO check if faster to call data_iter for each batch
-            train_input_augmented, train_target_augmented = data_iter[:]
+            train_input_augmented, train_target_augmented = train_input_augmented[idx], train_target_augmented[idx]
             for train_img, target_img in zip(torch.split(train_input_augmented, self.params["batch_size"]),
                                              torch.split(train_target_augmented, self.params["batch_size"])):
                 train_img, target_img = train_img.to(device), target_img.to(device)
@@ -101,6 +109,7 @@ class Model():
                 self.model.zero_grad()
                 loss.backward()
                 optimizer.step()
+            scheduler.step()
 
             # Evaluate the model every eval_step
             if (epoch + 1) % self.params["eval_step"] == 0:
@@ -110,13 +119,13 @@ class Model():
                     train_error = 0.
                     val_error = 0.
                     # Computing the number of split to compute the mean of the error of each batch
-                    if nb_images_train%eva_batch_size == 0:
-                        nb_split_train = nb_images_train//eva_batch_size
+                    if nb_images_train % eva_batch_size == 0:
+                        nb_split_train = nb_images_train // eva_batch_size
                     else:
                         nb_split_train = nb_images_train // eva_batch_size + 1
 
-                    if nb_images_val%eva_batch_size == 0:
-                        nb_split_val = nb_images_val//eva_batch_size
+                    if nb_images_val % eva_batch_size == 0:
+                        nb_split_val = nb_images_val // eva_batch_size
                     else:
                         nb_split_val = nb_images_val // eva_batch_size + 1
 
@@ -170,11 +179,9 @@ class Model():
         """
         # Set the model in testing mode
         self.model.train(False)
-        out = self.model(test_input.float()/255.0)
-        min = out.min()
-        max = out.max()-min
-        
-        return ((out - min ) / (max))*255
+        out = self.model(test_input.float() / 255.0)
+        # out[out > 1] = 1
+        return out * 255
 
     def psnr(self, denoised, ground_truth):
         """
@@ -188,3 +195,18 @@ class Model():
 
         mse = torch.mean((denoised - ground_truth) ** 2)
         return -10 * torch.log10(mse + 10 ** -8)
+
+    def predict_best_model(self, test_input):
+        """
+        Predicts with the model on the provided input.
+        :param test_input: Test input.
+        :return: The prediction (torch.Tensor).
+        """
+        # Set the model in testing mode
+        self.best_model.train(False)
+        out = self.best_model(test_input.float() / 255.0)
+        return out * 255
+        # min = out.min()
+        # max = out.max()-min
+        #
+        # return ((out - min ) / (max))*255

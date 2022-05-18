@@ -4,25 +4,6 @@ from torchvision.transforms import RandomAffine, ColorJitter
 from torchvision.transforms.functional import affine, adjust_brightness, adjust_contrast, adjust_saturation, adjust_hue
 
 
-# class RandomAffine2Img(RandomAffine):
-#     def __call__(self, img1, img2):
-#         """
-#         Applies the same random affine transformations to two images
-#         :param img1: First image
-#         :param img2: Second image
-#         :return: Tuple of transformed images
-#         """
-#
-#         # Get random parameters
-#         angle, translations, scale, shear = self.get_params(self.degrees, self.translate, self.scale, None, img1.size())
-#         translations, shear = list(translations), list(shear)  # We need lists instead of tuples for the next step
-#
-#         # Transform images
-#         transformed_img1 = affine(img1, angle, translations, scale, shear, fill=self.fill)
-#         transformed_img2 = affine(img2, angle, translations, scale, shear, fill=self.fill)
-#         return transformed_img1, transformed_img2
-
-
 class RandomRotation2Img():
 
     def __init__(self, prob):
@@ -57,7 +38,6 @@ class ColorJitter2Img(ColorJitter):
         Applies the same random color transformations to two images
         :param img1: First image
         :param img2: Second image
-        :param prob: Probability of transformation
         :return: Tuple of transformed images
         """
 
@@ -147,7 +127,6 @@ class DataIterator(Dataset):
                or 0 <= hue <= 0.5 and (isinstance(hue, float) or isinstance(hue, int)), \
             "Hue must be a float in [0, 0.5] or a tuple of two floats in [-0.5, 0.5]."
 
-        # self.affine_transformer = RandomAffine2Img(degrees, translate=translate, scale=scale, fill=fill)
         self.rotation_transformer = RandomRotation2Img(prob=prob)
         self.color_transformer = ColorJitter2Img(prob=prob, brightness=brightness, contrast=contrast,
                                                  saturation=saturation, hue=hue)
@@ -163,12 +142,12 @@ class DataIterator(Dataset):
         :return: Tuple of augmented images
         """
 
-        img1 = self.imgs1[index]
-        img2 = self.imgs2[index]
+        img1 = self.imgs1[index].clone()
+        img2 = self.imgs2[index].clone()
 
         # Apply transformations
         if len(img1) == 1:
-            img1, img2 = self.affine_transformer(img1, img2)
+            img1, img2 = self.rotation_transformer(img1, img2)
             img1, img2 = self.color_transformer(img1, img2)
         else:
             for n in range(len(img1)):
