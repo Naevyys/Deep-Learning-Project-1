@@ -35,8 +35,10 @@ class Model():
         Loads best model from file bestmodel.pth
         :return: None
         """
-        
-        self.best_model = torch.load(self.path + self.params["best_model"], map_location=lambda storage, loc: storage)
+        # Make sure that the model can be loaded whether it was trained on CPU or GPU 
+        self.best_model = self.model
+        self.best_model.load_state_dict(torch.load(self.path + self.params["best_model"], map_location = lambda storage, loc: storage))
+        self.best_model.eval()
 
     def train(self, train_input, train_target, num_epochs=None):
         """
@@ -93,7 +95,7 @@ class Model():
         criterion = utils.get_loss(self.params["error"])
         # Maximum number of epochs/iterations
         if num_epochs is None:
-            num_epochs = self.params["max_iter"]
+            num_epochs = self.params["max_epochs"]
 
         # Monitor time taken
         start = time.time()
@@ -161,7 +163,7 @@ class Model():
                + "_" + str(self.params["error"]) + "_" + str(self.params["lr"]) + "_" + str(
             self.params["batch_size"]) + "_" + date + ".pth"
 
-        torch.save(self.model,self.path + self.params["path_model"] + path)
+        torch.save(self.model.state_dict(),self.path + self.params["path_model"] + path)
         # Save the logs as well
         self.logs = torch.tensor(self.logs)
         torch.save(self.logs,self.path + self.params["path_logs"] + path)

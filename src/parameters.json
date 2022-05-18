@@ -4,13 +4,13 @@
     "error": "HU",
     "lr": 5e-3,
     "batch_size":64,
-    "max_iter": 25,
+    "max_epochs": 25,
     "img_channel": 3,
     "height": 32,
     "width": 32,
     "path_model": "/outputs/trained_models/", 
     "path_logs": "/outputs/logs/",
-    "best_model": "/outputs/trained_models/Noise2noise_ADA_HU_0.005_64_18052022_140314.pth",
+    "best_model": "/outputs/trained_models/Noise2noise_ADA_HU_0.005_64_18052022_222005.pth",
     "validation": 0.2,
     "eval_step": 5
 }
