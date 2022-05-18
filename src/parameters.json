@@ -8,9 +8,9 @@
     "img_channel": 3,
     "height": 32,
     "width": 32,
-    "path_model": "Proj_287452_337635_288228/Miniproject_1/outputs/trained_models/", 
-    "path_logs": "Proj_287452_337635_288228/Miniproject_1/outputs/logs/",
-    "best_model": "Noise2noise_SGD_L1_0.005_64_17052022_014119.pth",
+    "path_model": "/outputs/trained_models/", 
+    "path_logs": "/outputs/logs/",
+    "best_model": "/outputs/trained_models/Noise2noise_ADA_HU_0.005_64_18052022_140314.pth",
     "validation": 0.2,
     "eval_step": 5
 }

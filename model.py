@@ -4,6 +4,7 @@ from datetime import datetime
 import time as time
 from .src import utils
 from .src import data_iterator as di
+import pathlib
 
 
 class Model():
@@ -12,10 +13,10 @@ class Model():
         Instantiates the model class.
         :return: None
         """
-
+        self.path = str(pathlib.Path(__file__).parent.resolve())
         # Not very pretty in constructor, but best solution so far.
         # with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
-        with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
+        with open(self.path + "/src/parameters.json", "r") as read_file:
             self.params = json.load(read_file)
 
         # Loads the model that we want to train, according to the config file
@@ -34,7 +35,8 @@ class Model():
         Loads best model from file bestmodel.pth
         :return: None
         """
-        self.best_model = torch.load(self.params["path_model"] + self.params["best_model"])
+        
+        self.best_model = torch.load(self.path + self.params["best_model"], map_location=lambda storage, loc: storage)
 
     def train(self, train_input, train_target, num_epochs=None):
         """
@@ -159,10 +161,10 @@ class Model():
                + "_" + str(self.params["error"]) + "_" + str(self.params["lr"]) + "_" + str(
             self.params["batch_size"]) + "_" + date + ".pth"
 
-        torch.save(self.model, self.params["path_model"] + path)
+        torch.save(self.model,self.path + self.params["path_model"] + path)
         # Save the logs as well
         self.logs = torch.tensor(self.logs)
-        torch.save(self.logs, self.params["path_logs"] + path)
+        torch.save(self.logs,self.path + self.params["path_logs"] + path)
 
         # Record and print time
         end = time.time()
