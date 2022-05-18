@@ -25,15 +25,25 @@ try to increase to 0.2
 
 14h03 : ADA HU 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 24.03
 
+
 Now try to cut the last part of U-net : comment from conv5 to conv6
 
-14h03 : ADA HU 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 23.91
-
+14h43 : ADA HU 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 23.91
 
 15h02 : ADA HU 4e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 23.96
 
 15h34 : ADA HU 5e-3 64 24 scheduler(8, 0.6) hardsigmoid-activation -> psnr = 23.94
 
 15h48 : ADA HU 5e-3 64 24 scheduler(10, 0.2) hardsigmoid-activation -> psnr = 23.81
+
+
+Deeper cut: comment line 86 to 106 + dec_conv3a 
+
+19h50 : ADA HU 6e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 23.95
+
+20h25 : ADA HU 6e-3 64 24 scheduler(15, 0.2) hardsigmoid-activation -> psnr = 23.99
+
+20h41 : ADA L2 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 24.12
+
 
 
