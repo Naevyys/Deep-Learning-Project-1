@@ -10,7 +10,7 @@
     "width": 32,
     "path_model": "/outputs/trained_models/", 
     "path_logs": "/outputs/logs/",
-    "best_model": "/outputs/trained_models/Noise2noise_ADA_HU_0.005_64_18052022_222005.pth",
+    "best_model": "/outputs/trained_models/Noise2noise_ADA_HU_0.005_64_19052022_030010.pth",
     "validation": 0.2,
     "eval_step": 5
 }

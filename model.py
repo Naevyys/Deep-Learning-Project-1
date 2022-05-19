@@ -20,7 +20,9 @@ class Model():
             self.params = json.load(read_file)
 
         # Loads the model that we want to train, according to the config file
-        self.model = utils.get_model(self.params)
+        self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+        print("You are using the device: " + str(self.device))
+        self.model = utils.get_model(self.params).to(self.device)
         # Loads the best model with pre-trained weights
         # TODO
         self.best_model = None
@@ -36,8 +38,9 @@ class Model():
         :return: None
         """
         # Make sure that the model can be loaded whether it was trained on CPU or GPU 
-        self.best_model = self.model
-        self.best_model.load_state_dict(torch.load(self.path + self.params["best_model"], map_location = lambda storage, loc: storage))
+        self.best_model = utils.get_model(self.params).to(self.device)
+        self.best_model.load_state_dict(
+            torch.load(self.path + self.params["best_model"], map_location=lambda storage, loc: storage))
         self.best_model.eval()
 
     def train(self, train_input, train_target, num_epochs=None):
@@ -48,9 +51,6 @@ class Model():
         :param num_epochs: number of epochs
         :return: None
         """
-
-        device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-        print("You are using the device: " + str(device))
 
         # Custom train/validation split - Start by shuffling and sending to GPU is available
         idx = torch.randperm(train_input.size()[0])
@@ -83,13 +83,12 @@ class Model():
         nb_images_train = len(data_iter)
         nb_images_val = len(val_input)
 
-        self.model = self.model.to(device)
         # Set the model in train mode
         self.model.train(True)
 
         # Initialize optimizer
         optimizer = utils.get_optimizer(self.model, self.params["opti_type"], self.params["lr"])
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.2)
+        # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.2)
 
         # The error function
         criterion = utils.get_loss(self.params["error"])
@@ -107,13 +106,13 @@ class Model():
             train_input_augmented, train_target_augmented = train_input_augmented[idx], train_target_augmented[idx]
             for train_img, target_img in zip(torch.split(train_input_augmented, self.params["batch_size"]),
                                              torch.split(train_target_augmented, self.params["batch_size"])):
-                train_img, target_img = train_img.to(device), target_img.to(device)
+                train_img, target_img = train_img.to(self.device), target_img.to(self.device)
                 output = self.model(train_img)
                 loss = criterion(output, target_img)
                 self.model.zero_grad()
                 loss.backward()
                 optimizer.step()
-            scheduler.step()
+            # scheduler.step()
 
             # Evaluate the model every eval_step
             if (epoch + 1) % self.params["eval_step"] == 0:
@@ -138,13 +137,13 @@ class Model():
                     val_zip = zip(torch.split(val_input, eva_batch_size), torch.split(val_target, eva_batch_size))
 
                     for train_img, target_img in train_zip:
-                        train_img = train_img.to(device)
-                        target_img = target_img.to(device)
+                        train_img = train_img.to(self.device)
+                        target_img = target_img.to(self.device)
                         train_error += criterion(self.model(train_img), target_img)
 
                     for val_img, val_img_target in val_zip:
-                        val_img = val_img.to(device)
-                        val_img_target = val_img_target.to(device)
+                        val_img = val_img.to(self.device)
+                        val_img_target = val_img_target.to(self.device)
                         val_error += criterion(self.model(val_img), val_img_target)
 
                     train_error = train_error / nb_split_train
@@ -163,10 +162,10 @@ class Model():
                + "_" + str(self.params["error"]) + "_" + str(self.params["lr"]) + "_" + str(
             self.params["batch_size"]) + "_" + date + ".pth"
 
-        torch.save(self.model.state_dict(),self.path + self.params["path_model"] + path)
+        torch.save(self.model.state_dict(), self.path + self.params["path_model"] + path)
         # Save the logs as well
         self.logs = torch.tensor(self.logs)
-        torch.save(self.logs,self.path + self.params["path_logs"] + path)
+        torch.save(self.logs, self.path + self.params["path_logs"] + path)
 
         # Record and print time
         end = time.time()
@@ -181,10 +180,16 @@ class Model():
         :param test_input: Test input.
         :return: The prediction (torch.Tensor).
         """
-        # Set the model in testing mode
-        self.model.train(False)
-        out = self.model(test_input.float() / 255.0)
-        # out[out > 1] = 1
+
+        test_input = test_input.to(self.device).float()
+        if self.best_model is None:
+            # Set the model in testing mode
+            self.model.train(False)
+            out = self.model(test_input / 255.0)
+        else:
+            # Set the model in testing mode
+            self.best_model.train(False)
+            out = self.best_model(test_input / 255.0)
         return out * 255
 
     def psnr(self, denoised, ground_truth):
@@ -197,20 +202,6 @@ class Model():
 
         assert denoised.shape == ground_truth.shape, "Denoised image and ground truth must have the same shape!"
 
-        mse = torch.mean((denoised - ground_truth) ** 2)
-        return -10 * torch.log10(mse + 10 ** -8)
-
-    def predict_best_model(self, test_input):
-        """
-        Predicts with the model on the provided input.
-        :param test_input: Test input.
-        :return: The prediction (torch.Tensor).
-        """
-        # Set the model in testing mode
-        self.best_model.train(False)
-        out = self.best_model(test_input.float() / 255.0)
-        return out * 255
-        # min = out.min()
-        # max = out.max()-min
-        #
-        # return ((out - min ) / (max))*255
+        # mse = torch.mean((denoised - ground_truth) ** 2)
+        # return -10 * torch.log10(mse + 10 ** -8)
+        return - 10 * torch.log10(((denoised-ground_truth) ** 2).mean((1, 2, 3))).mean()

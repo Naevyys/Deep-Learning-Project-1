@@ -40,8 +40,6 @@ class Noise2noise(nn.Module):
         super().__init__()
 
         self.img_ch = params["img_channel"]
-        self.h = params["height"]
-        self.w = params["width"]
 
         self.enc_conv0 = nn.Conv2d(self.img_ch, 48, kernel_size=3, stride=(1, 1), padding='same')
         self.enc_conv1 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1), padding='same')
@@ -83,31 +81,31 @@ class Noise2noise(nn.Module):
 
         x = self.lre(self.enc_conv3(x))
         x = self.mp(x)
-        skips.append(x)
-
-        x = self.lre(self.enc_conv4(x))
-        x = self.mp(x)
-        skips.append(x)
-
+        # skips.append(x)
+        #
+        # x = self.lre(self.enc_conv4(x))
+        # x = self.mp(x)
+        # skips.append(x)
+        #
         # x = self.lre(self.enc_conv5(x))
         # x = self.mp(x)
         # x = self.lre(self.enc_conv6(x))
         #
         # x = self.upscale2d(x)
-
-        x = torch.concat([x, skips.pop()], dim=1)
-
-        x = self.lre(self.dec_conv5a(x))
-        x = self.lre(self.dec_conv5b(x))
+        #
+        # x = torch.concat([x, skips.pop()], dim=1)
+        #
+        # x = self.lre(self.dec_conv5a(x))
+        # x = self.lre(self.dec_conv5b(x))
+        #
+        # x = self.upscale2d(x)
+        # x = torch.concat([x, skips.pop()], dim=1)
+        # x = self.lre(self.dec_conv4a(x))
+        # x = self.lre(self.dec_conv4b(x))
 
         x = self.upscale2d(x)
         x = torch.concat([x, skips.pop()], dim=1)
-        x = self.lre(self.dec_conv4a(x))
-        x = self.lre(self.dec_conv4b(x))
-
-        x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
-        x = self.lre(self.dec_conv3a(x))
+        # x = self.lre(self.dec_conv3a(x))
         x = self.lre(self.dec_conv3b(x))
 
         x = self.upscale2d(x)
