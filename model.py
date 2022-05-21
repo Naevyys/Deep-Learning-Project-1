@@ -52,6 +52,9 @@ class Model():
         :return: None
         """
 
+        # Monitor time taken
+        start = time.time()
+
         # Custom train/validation split - Start by shuffling and sending to GPU is available
         idx = torch.randperm(train_input.size()[0])
         train_input = train_input[idx, :, :, :]
@@ -63,8 +66,6 @@ class Model():
         val_target = (train_target[0:split] / 255)
         train_input = (train_input[split:-1])
         train_target = (train_target[split:-1])
-
-        num_shuffle = 3  # rate of dataset and data augmentation shuffling
 
         # Data augmentation
 
@@ -88,7 +89,6 @@ class Model():
 
         # Initialize optimizer
         optimizer = utils.get_optimizer(self.model, self.params["opti_type"], self.params["lr"])
-        # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.2)
 
         # The error function
         criterion = utils.get_loss(self.params["error"])
@@ -96,12 +96,8 @@ class Model():
         if num_epochs is None:
             num_epochs = self.params["max_epochs"]
 
-        # Monitor time taken
-        start = time.time()
         # The loop on the epochs
         for epoch in range(0, num_epochs):
-            if epoch % num_shuffle == 0:
-                train_input_augmented, train_target_augmented = data_iter[:]
             idx = torch.randperm(nb_images_train)
             train_input_augmented, train_target_augmented = train_input_augmented[idx], train_target_augmented[idx]
             for train_img, target_img in zip(torch.split(train_input_augmented, self.params["batch_size"]),
@@ -112,7 +108,6 @@ class Model():
                 self.model.zero_grad()
                 loss.backward()
                 optimizer.step()
-            # scheduler.step()
 
             # Evaluate the model every eval_step
             if (epoch + 1) % self.params["eval_step"] == 0:
@@ -169,9 +164,9 @@ class Model():
 
         # Record and print time
         end = time.time()
-        min = (end - start) // 60
+        minutes = (end - start) // 60
         sec = (end - start) % 60
-        print("\nTime taken for training: {:.0f} min {:.0f} s".format(min, sec))
+        print("\nTime taken for training: {:.0f} min {:.0f} s".format(minutes, sec))
         del train_input_augmented, train_target_augmented, train_input, train_target
 
     def predict(self, test_input):
@@ -201,7 +196,4 @@ class Model():
         """
 
         assert denoised.shape == ground_truth.shape, "Denoised image and ground truth must have the same shape!"
-
-        # mse = torch.mean((denoised - ground_truth) ** 2)
-        # return -10 * torch.log10(mse + 10 ** -8)
         return - 10 * torch.log10(((denoised-ground_truth) ** 2).mean((1, 2, 3))).mean()

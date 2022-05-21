@@ -48,17 +48,17 @@ class Noise2noise(nn.Module):
         self.enc_conv4 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1), padding='same')
         self.enc_conv5 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1,), padding='same')
         self.enc_conv6 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv5a = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv5b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv4a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv4b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv3a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv3b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv2a = nn.Conv2d(144, 96,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv2b = nn.Conv2d(96, 96,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv1a = nn.Conv2d(96+self.img_ch, 64,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv1b = nn.Conv2d(64, 32,kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv1 = nn.Conv2d(32, self.img_ch,kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv5a = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv5b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv4a = nn.Conv2d(144, 96, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv4b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv3a = nn.Conv2d(144, 96, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv3b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv2a = nn.Conv2d(144, 96, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv2b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1a = nn.Conv2d(96+self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1b = nn.Conv2d(64, 32, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1 = nn.Conv2d(32, self.img_ch, kernel_size=3, stride=(1, 1), padding='same')
 
         self.lre = torch.nn.LeakyReLU(0.1)
         self.relu = torch.nn.ReLU()
@@ -75,50 +75,45 @@ class Noise2noise(nn.Module):
         x = self.mp(x)
         skips.append(x)
 
-        x = self.lre(self.enc_conv2(x))
-        x = self.mp(x)
-        skips.append(x)
-
-        x = self.lre(self.enc_conv3(x))
-        x = self.mp(x)
+        # x = self.lre(self.enc_conv2(x))
+        # x = self.mp(x)
         # skips.append(x)
-        #
+
+        # x = self.lre(self.enc_conv3(x))
+        # x = self.mp(x)
+        # skips.append(x)
+
         # x = self.lre(self.enc_conv4(x))
         # x = self.mp(x)
         # skips.append(x)
-        #
+
         # x = self.lre(self.enc_conv5(x))
         # x = self.mp(x)
         # x = self.lre(self.enc_conv6(x))
-        #
+
         # x = self.upscale2d(x)
-        #
         # x = torch.concat([x, skips.pop()], dim=1)
-        #
         # x = self.lre(self.dec_conv5a(x))
         # x = self.lre(self.dec_conv5b(x))
-        #
+
         # x = self.upscale2d(x)
         # x = torch.concat([x, skips.pop()], dim=1)
         # x = self.lre(self.dec_conv4a(x))
         # x = self.lre(self.dec_conv4b(x))
 
-        x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        # x = self.upscale2d(x)
+        # x = torch.concat([x, skips.pop()], dim=1)
         # x = self.lre(self.dec_conv3a(x))
-        x = self.lre(self.dec_conv3b(x))
+        # x = self.lre(self.dec_conv3b(x))
 
-        x = self.upscale2d(x)
+        # x = self.upscale2d(x)
         x = torch.concat([x, skips.pop()], dim=1)
-        x = self.lre(self.dec_conv2a(x))
+        # x = self.lre(self.dec_conv2a(x))
         x = self.lre(self.dec_conv2b(x))
 
         x = self.upscale2d(x)
-
         x = torch.concat([x, skips.pop()], dim=1)
-
         x = self.lre(self.dec_conv1a(x))
-
         x = self.lre(self.dec_conv1b(x))
 
         x = self.hsig(self.dec_conv1(x))

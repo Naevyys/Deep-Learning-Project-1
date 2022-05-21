@@ -1,10 +1,10 @@
 {
     "model": "Noise2noise",
     "opti_type": "ADA",
-    "error": "L2",
-    "lr": 7e-3,
+    "error": "HU",
+    "lr": 1e-3,
     "batch_size":64,
-    "max_epochs": 25,
+    "max_epochs": 16,
     "img_channel": 3,
     "height": 32,
     "width": 32,

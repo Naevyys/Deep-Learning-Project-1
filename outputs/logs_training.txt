@@ -1,52 +1,75 @@
-9hxx : ADA L1 5e-3 64 24 no scheduler relu-activation -> does not train
-9h14 : ADA L1 1e-3 64 24 no scheduler relu-activation -> psnr = 23.4
-9h24 : ADA L1 5e-4 64 24 no scheduler relu-activation -> psnr = 23.19
-9hxx : ADA L1 1e-2 64 24 scheduler(6, 0.2) relu-activation -> not good at all
-9h43 : ADA L1 1e-3 64 24 scheduler(5, 0.8) relu-activation -> psnr = 23.30
-9h52 : ADA HU 1e-3 64 24 no scheduler relu-activation -> psnr = 23.54
-10h06 : ADA HU 1e-3 64 24 no scheduler sigmoid-activation -> psnr = 23.31
-10h25 : ADA HU 2e-3 64 24 no scheduler sigmoid-activation -> psnr = 23.88
-10h36 : ADA HU 2e-3 64 24 scheduler(8, 0.2) sigmoid-activation -> psnr = 23.62
-10h46 : ADA HU 5e-3 64 24 no scheduler sigmoid-activation -> psnr = 23.82
-11h02 : ADA HU 5e-3 64 24 scheduler(8, 0.5) sigmoid-activation -> psnr = 23.88
-11h37 : ADA L2 3e-3 64 24 no scheduler sigmoid-activation -> psnr = 23.79
-11h50 : ADA L2 3e-3 64 24 no scheduler sigmoid-activation -> psnr = 23.85
+ON OUBLIE TOUT MAINTENANT ON A QUE 13 EPOCHS :
+ON REPREND A 0 AVEC TOUT LE MODEL
 
-until this point augmentation prob = 0.05
-try to increase to 0.2
+17h23 : ADA L2 5e-3 64 13 hardsigmoid-activation -> psnr = 24.36
 
-12h50 : ADA L2 5e-3 64 24 scheduler(8, 0.2) sigmoid-activation -> psnr = 23.74
+17h29 : ADA L2 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.25
 
-13h16 : ADA L2 3e-3 64 24 no scheduler sigmoid-activation -> psnr = 23.93
+17h35 : ADA L2 1e-3 64 13 hardsigmoid-activation -> psnr = 23.07
 
-13h27 : ADA HU 2e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 23.60
+17h44 : ADA L2 7.5e-3 64 13 hardsigmoid-activation -> psnr = 6.42
 
-13h52 : ADA HU 4e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 23.89
 
-14h03 : ADA HU 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 24.03
+17h52 : ADA L1 1e-3 64 13 hardsigmoid-activation -> psnr = 23.01
+
+18h00 : ADA L1 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.05
+
+18h07 : ADA L1 5e-3 64 13 hardsigmoid-activation -> psnr = 24.18
+
+18h : ADA L1 7.5e-3 64 13 hardsigmoid-activation -> psnr = 6.42
+
+
+18h20 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.06
+
+18h26 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.20
+
+18h33 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 24.42
+
+18h41 : ADA HU 7.5e-3 64 13 hardsigmoid-activation -> psnr = 24.52 -> c'était un coup de chance, ca converge rarement.
+
+18h48 : ADA HU 1e-2 64 13 hardsigmoid-activation -> psnr = 6.42
+
 
 
 Now try to cut the last part of U-net : comment from conv5 to conv6
 
-14h43 : ADA HU 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 23.91
+19h34 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.09
 
-15h02 : ADA HU 4e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 23.96
+19h43 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.29
 
-15h34 : ADA HU 5e-3 64 24 scheduler(8, 0.6) hardsigmoid-activation -> psnr = 23.94
+19h51 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 24.37
 
-15h48 : ADA HU 5e-3 64 24 scheduler(10, 0.2) hardsigmoid-activation -> psnr = 23.81
+19h : ADA HU 7.5e-3 64 13 hardsigmoid-activation -> psnr = 5.9
 
 
-Deeper cut: comment line 86 to 106 + dec_conv3a 
+Deeper cut: comment line 86 to 99 + dec_conv4a 
 
-19h50 : ADA HU 6e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 23.95
+20h59 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.20
 
-20h25 : ADA HU 6e-3 64 24 scheduler(15, 0.2) hardsigmoid-activation -> psnr = 23.99
+21h06 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.20
 
-20h41 : ADA L2 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 24.12
+21h12 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 6.42 -> on test a 4e-3 vu que ca diverge déjà ici
 
-NEW PSNR :
+21h30 : ADA HU 4e-3 64 13 hardsigmoid-activation -> psnr = 24.74
 
-12h57 : ADA L2 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 24.59
 
-13h34 : ADA L2 7e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 24.72
+Deeper cut: comment line 82 to 104 + dec_conv3a 
+
+21h46 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.18
+
+21h56 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.35
+
+22h24 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 24.58
+
+22h35 : ADA HU 4e-3 64 13 hardsigmoid-activation -> psnr = 24.46
+
+
+Even deeper cut: comment line 78 to 109 + dec_conv2a -> only one maxpool + upsample
+
+23h00 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.40
+
+23h05 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.29
+
+23h10 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 24.53
+
+23h21 : ADA HU 4e-3 64 13 hardsigmoid-activation -> psnr = 24.77

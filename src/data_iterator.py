@@ -77,8 +77,8 @@ class StandardizeImg():
         """
         assert torch.is_tensor(img1), "Argument must be a torch tensor"
         assert torch.is_tensor(img2), "Argument must be a torch tensor"
-        min_val = torch.min(torch.concat((torch.min(img1), torch.min(img2))))
-        max_val = torch.max(torch.concat((torch.max(img1), torch.max(img2))))
+        min_val = min(torch.min(img1), torch.min(img2))
+        max_val = max(torch.max(img1), torch.max(img2))
         return (img1-min_val) / max_val, (img2-min_val) / max_val
 
 
