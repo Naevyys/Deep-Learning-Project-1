@@ -1,8 +1,8 @@
 {
     "model": "Noise2noise",
     "opti_type": "ADA",
-    "error": "HU",
-    "lr": 5e-3,
+    "error": "L2",
+    "lr": 7e-3,
     "batch_size":64,
     "max_epochs": 25,
     "img_channel": 3,
@@ -12,5 +12,5 @@
     "path_logs": "/outputs/logs/",
     "best_model": "/outputs/trained_models/Noise2noise_ADA_HU_0.005_64_19052022_030010.pth",
     "validation": 0.2,
-    "eval_step": 5
+    "eval_step": 100
 }

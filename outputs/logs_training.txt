@@ -45,5 +45,8 @@ Deeper cut: comment line 86 to 106 + dec_conv3a
 
 20h41 : ADA L2 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 24.12
 
+NEW PSNR :
 
+12h57 : ADA L2 5e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 24.59
 
+13h34 : ADA L2 7e-3 64 24 no scheduler hardsigmoid-activation -> psnr = 24.72

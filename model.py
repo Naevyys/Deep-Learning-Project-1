@@ -64,12 +64,12 @@ class Model():
         train_input = (train_input[split:-1])
         train_target = (train_target[split:-1])
 
-        num_shuffle = 4  # rate of dataset and data augmentation shuffling
+        num_shuffle = 3  # rate of dataset and data augmentation shuffling
 
         # Data augmentation
 
         # Parameters for augmentation
-        probability = 0.2
+        probability = 0.5
         brightness = (0.9, 1)
         contrast = (0.7, 1)
         saturation = (0.5, 1)

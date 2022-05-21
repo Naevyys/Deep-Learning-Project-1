@@ -7,6 +7,9 @@ from torchvision.transforms.functional import affine, adjust_brightness, adjust_
 class RandomRotation2Img():
 
     def __init__(self, prob):
+        """
+        :param prob:
+        """
         self.prob = prob
 
     def __call__(self, img1, img2):
@@ -74,7 +77,9 @@ class StandardizeImg():
         """
         assert torch.is_tensor(img1), "Argument must be a torch tensor"
         assert torch.is_tensor(img2), "Argument must be a torch tensor"
-        return img1 / 255, img2 / 255
+        min_val = torch.min(torch.concat((torch.min(img1), torch.min(img2))))
+        max_val = torch.max(torch.concat((torch.max(img1), torch.max(img2))))
+        return (img1-min_val) / max_val, (img2-min_val) / max_val
 
 
 class DataIterator(Dataset):
@@ -97,23 +102,13 @@ class DataIterator(Dataset):
 
         # Notes:
         # - No need to clean our data, since we have no useless or collinear features, or at most maybe color channels
-        #   -> TODO: investigate by training on black and white images as well
         # - No need to balance our data, since we do not classify anything
         # - This iterator does not avoid loading everything into memory, since we first load the entire data, then
         #   pass it to the interator
-        # - We do not shear our images as they have a very low resolution
+
 
         assert isinstance(imgs1, torch.Tensor) and isinstance(imgs2, torch.Tensor), "Images must be tensors!"
         assert imgs1.size() == imgs2.size(), "Tensors of first and second images must have the same size!"
-        # assert isinstance(degrees, int) or isinstance(degrees, tuple) and len(degrees) == 2 \
-        #        and isinstance(degrees[0], int) and isinstance(degrees[1], int), \
-        #     "Degrees must be an integer or a list of integers"
-        # assert isinstance(translate, tuple) and len(translate) == 2 and 0 <= translate[0] <= 1 \
-        #        and 0 <= translate[1] <= 1 or translate is None, "Translate must be a tuple of size 2 with values in " \
-        #                                                         "[0, 1] or None"
-        # assert isinstance(scale, tuple) and len(scale) == 2 or scale is None, \
-        #     "Scale must be a tuple of size 2 or None"
-        # assert isinstance(fill, int), "Fill value must be an integer"
         assert isinstance(brightness, tuple) and brightness[0] >= 0 and brightness[1] >= 0 \
                or brightness >= 0 and (isinstance(brightness, float) or isinstance(brightness, int)), \
             "Brightness must be a float or tuple of two floats with non-negative value(s)."
