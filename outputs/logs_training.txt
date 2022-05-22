@@ -68,8 +68,9 @@ Even deeper cut: comment line 78 to 109 + dec_conv2a -> only one maxpool + upsam
 
 23h00 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.40
 
-23h05 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.29
+23h05 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.29git 
 
 23h10 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 24.53
 
-23h21 : ADA HU 7.5e-3 64 13 hardsigmoid-activation -> psnr = 24.77 (ou 24.62 sur le 2eme (23h27))
+23h21 : ADA HU 7.5e-3 64 13 hardsigmoid-activation -> psnr = 24.77 (ou 24.62 sur le 2eme (23h27)
+ ou 24.84 sur le 3ème (02h25))

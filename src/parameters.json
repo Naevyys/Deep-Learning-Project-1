@@ -1,16 +1,16 @@
 {
-    "model": "Noise2noise",
+    "model": "Noise2noiseSimplified4",
     "opti_type": "ADA",
     "error": "HU",
-    "lr": 5e-3,
+    "lr": 7.5e-3,
     "batch_size":64,
-    "max_epochs": 16,
+    "max_epochs": 13,
     "img_channel": 3,
     "height": 32,
     "width": 32,
     "path_model": "/outputs/trained_models/", 
     "path_logs": "/outputs/logs/",
-    "best_model": "/outputs/trained_models/Noise2noise_ADA_HU_0.0075_64_21052022_232100.pth",
+    "best_model": "/outputs/trained_models/Noise2noiseSimplified4_ADA_HU_0.0075_64_22052022_022449.pth",
     "validation": 0.2,
     "eval_step": 2
 }
