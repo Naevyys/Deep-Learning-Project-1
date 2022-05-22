@@ -14,7 +14,8 @@ class Model():
         Instantiates the model class.
         :return: None
         """
-
+        # Due to miniproject 2, we need to correct these parameters
+        torch.set_default_dtype(torch.float32)
         torch.set_grad_enabled(True)
         self.path = str(pathlib.Path(__file__).parent.resolve())
         # Not very pretty in constructor, but best solution so far.
