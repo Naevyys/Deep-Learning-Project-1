@@ -7,12 +7,15 @@ from .src import data_iterator as di
 import pathlib
 
 
+
 class Model():
     def __init__(self):
         """
         Instantiates the model class.
         :return: None
         """
+
+        torch.set_grad_enabled(True)
         self.path = str(pathlib.Path(__file__).parent.resolve())
         # Not very pretty in constructor, but best solution so far.
         # with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
