@@ -24,7 +24,6 @@ class Model():
         print("You are using the device: " + str(self.device))
         self.model = utils.get_model(self.params).to(self.device)
         # Loads the best model with pre-trained weights
-        # TODO
         self.best_model = None
         # To store the training logs
         # First row: the epoch number
@@ -57,6 +56,7 @@ class Model():
 
         # Custom train/validation split - Start by shuffling and sending to GPU is available
         idx = torch.randperm(train_input.size()[0])
+
         train_input = train_input[idx, :, :, :]
         train_target = train_target[idx, :, :, :]
         # Then take the last images as validation set (w.r.t. proportion)

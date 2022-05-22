@@ -1,6 +1,6 @@
 import torch
-#import src.Noise2noise
-from .noise2noise import TestNet, Noise2noise
+import src.noise2noise as n2n
+# from .noise2noise import TestNet, Noise2noise
 
 
 def to_cuda(x):
@@ -65,9 +65,17 @@ def get_model(params):
     type = params["model"]
 
     if type == "TestNet":
-        return TestNet(params)
+        return n2n.TestNet(params)
     elif type == "Noise2noise":
-        return Noise2noise(params)
+        return n2n.Noise2noise(params)
+    elif type == "Noise2noiseSimplified1":
+        return n2n.Noise2noiseSimplified1(params)
+    elif type == "Noise2noiseSimplified2":
+        return n2n.Noise2noiseSimplified2(params)
+    elif type == "Noise2noiseSimplified3":
+        return n2n.Noise2noiseSimplified3(params)
+    elif type == "Noise2noiseSimplified4":
+        return n2n.Noise2noiseSimplified4(params)
     else:
          raise Exception("Sorry, we could not find any model corresponding to: "+params["model"])
 
