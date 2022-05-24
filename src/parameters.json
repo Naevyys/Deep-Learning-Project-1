@@ -1,16 +1,16 @@
 {
-    "model": "TestNet",
-    "opti_type": "SGD",
-    "error": "L2",
-    "lr": 1e-2,
-    "batch_size": 64, 
-    "max_iter": 100,
+    "model": "Noise2noiseSimplified4",
+    "opti_type": "ADA",
+    "error": "HU",
+    "lr": 7.5e-3,
+    "batch_size":64,
+    "max_epochs": 13,
     "img_channel": 3,
     "height": 32,
     "width": 32,
-    "path_model": "outputs/trained_models/", 
-    "path_logs": "outputs/logs/",
-    "best_model": "TestNet_SGD_L2_0.01_64_16042022_023735.pth",
+    "path_model": "/outputs/trained_models/", 
+    "path_logs": "/outputs/logs/",
+    "best_model": "/outputs/trained_models/Noise2noiseSimplified4_ADA_HU_0.0075_64_22052022_022449.pth",
     "validation": 0.2,
-    "eval_step": 5
+    "eval_step": 2
 }

@@ -42,24 +42,24 @@ noisy_imgs_1, noisy_imgs_2 = torch.load(train_data_file)
 noisy_imgs, clean_imgs = torch.load(val_data_file)
 
 # Parameters for augmentation
-degrees = 180
-translate = (0.1, 0.1)
-scale = (0.9, 1.2)
+probability = 0.5
 brightness = (0.9, 1)
 contrast = (0.7, 1)
 saturation = (0.5, 1)
 hue = (0, 0.4)
 
 iterator = DataIterator(noisy_imgs_1, noisy_imgs_2)  # No augmentation
-iterator_augmented = DataIterator(noisy_imgs_1, noisy_imgs_2,
-    degrees=degrees, translate=translate, scale=scale,  # With affine transformation augmentation
-    brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)  # With color transformation augmentation
+iterator_augmented = DataIterator(noisy_imgs_1, noisy_imgs_2, prob=probability,
+                                  brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
 
-samples = 5
-random_index = torch.randint(0, 50000, (samples,))
+samples = 10
+torch.manual_seed(42)
+random_index = torch.randint(0, 2000, (samples,))
+data1, data2 = iterator[0:2000]
+data_augmented1, data_augmented2 = iterator_augmented[0:2000]
 for index in random_index:
-    sample_img1, sample_img2 = iterator.__getitem__(index.item())
-    sample_img1_aug, sample_img2_aug = iterator_augmented.__getitem__(index.item())
+    sample_img1, sample_img2 = data1[index.item()], data2[index.item()]
+    sample_img1_aug, sample_img2_aug = data_augmented1[index.item()], data_augmented2[index.item()]
 
     fig, ax = plt.subplots(2, 2)
 
@@ -68,3 +68,5 @@ for index in random_index:
     ax[1, 0].imshow(sample_img1_aug.numpy().transpose((1, 2, 0)))  # Augmented images
     ax[1, 1].imshow(sample_img2_aug.numpy().transpose((1, 2, 0)))
     plt.show()
+
+

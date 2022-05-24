@@ -1,0 +1,76 @@
+ON OUBLIE TOUT MAINTENANT ON A QUE 13 EPOCHS :
+ON REPREND A 0 AVEC TOUT LE MODEL
+
+17h23 : ADA L2 5e-3 64 13 hardsigmoid-activation -> psnr = 24.36
+
+17h29 : ADA L2 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.25
+
+17h35 : ADA L2 1e-3 64 13 hardsigmoid-activation -> psnr = 23.07
+
+17h44 : ADA L2 7.5e-3 64 13 hardsigmoid-activation -> psnr = 6.42
+
+
+17h52 : ADA L1 1e-3 64 13 hardsigmoid-activation -> psnr = 23.01
+
+18h00 : ADA L1 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.05
+
+18h07 : ADA L1 5e-3 64 13 hardsigmoid-activation -> psnr = 24.18
+
+18h : ADA L1 7.5e-3 64 13 hardsigmoid-activation -> psnr = 6.42
+
+
+18h20 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.06
+
+18h26 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.20
+
+18h33 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 24.42
+
+18h41 : ADA HU 7.5e-3 64 13 hardsigmoid-activation -> psnr = 24.52 -> c'était un coup de chance, ca converge rarement.
+
+18h48 : ADA HU 1e-2 64 13 hardsigmoid-activation -> psnr = 6.42
+
+
+
+Now try to cut the last part of U-net : comment from conv5 to conv6
+
+19h34 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.09
+
+19h43 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.29
+
+19h51 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 24.37
+
+19h : ADA HU 7.5e-3 64 13 hardsigmoid-activation -> psnr = 5.9
+
+
+Deeper cut: comment line 86 to 99 + dec_conv4a 
+
+20h59 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.20
+
+21h06 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.20
+
+21h12 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 6.42 -> on test a 4e-3 vu que ca diverge déjà ici
+
+21h30 : ADA HU 4e-3 64 13 hardsigmoid-activation -> psnr = 24.74
+
+
+Deeper cut: comment line 82 to 104 + dec_conv3a 
+
+21h46 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.18
+
+21h56 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.35
+
+22h24 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 24.58
+
+22h35 : ADA HU 4e-3 64 13 hardsigmoid-activation -> psnr = 24.46
+
+
+Even deeper cut: comment line 78 to 109 + dec_conv2a -> only one maxpool + upsample
+
+23h00 : ADA HU 1e-3 64 13 hardsigmoid-activation -> psnr = 23.40
+
+23h05 : ADA HU 2.5e-3 64 13 hardsigmoid-activation -> psnr = 24.29git 
+
+23h10 : ADA HU 5e-3 64 13 hardsigmoid-activation -> psnr = 24.53
+
+23h21 : ADA HU 7.5e-3 64 13 hardsigmoid-activation -> psnr = 24.77 (ou 24.62 sur le 2eme (23h27)
+ ou 24.84 sur le 3ème (02h25))
