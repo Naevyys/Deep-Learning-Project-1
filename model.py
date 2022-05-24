@@ -27,8 +27,6 @@ class Model():
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         print("You are using the device: " + str(self.device))
         self.model = utils.get_model(self.params).to(self.device)
-        # Loads the best model with pre-trained weights
-        self.best_model = None
         # To store the training logs
         # First row: the epoch number
         # Second row: the training error
@@ -41,10 +39,9 @@ class Model():
         :return: None
         """
         # Make sure that the model can be loaded whether it was trained on CPU or GPU 
-        self.best_model = utils.get_model(self.params).to(self.device)
-        self.best_model.load_state_dict(
+        self.model.load_state_dict(
             torch.load(self.path + self.params["best_model"], map_location=lambda storage, loc: storage))
-        self.best_model.eval()
+        self.model.eval() 
 
     def train(self, train_input, train_target, num_epochs=None):
         """
@@ -181,14 +178,8 @@ class Model():
         """
 
         test_input = test_input.to(self.device).float()
-        if self.best_model is None:
-            # Set the model in testing mode
-            self.model.train(False)
-            out = self.model(test_input / 255.0)
-        else:
-            # Set the model in testing mode
-            self.best_model.train(False)
-            out = self.best_model(test_input / 255.0)
+        self.model.eval()
+        out = self.model(test_input / 255.0).float()
         return out * 255
 
     def psnr(self, denoised, ground_truth):
