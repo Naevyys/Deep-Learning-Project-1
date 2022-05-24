@@ -2,8 +2,8 @@ import torch
 import json
 from datetime import datetime
 import time as time
-from .src import utils
-from .src import data_iterator as di
+from .others.src import utils
+from .others.src import data_iterator as di
 import pathlib
 
 
@@ -20,7 +20,7 @@ class Model():
         self.path = str(pathlib.Path(__file__).parent.resolve())
         # Not very pretty in constructor, but best solution so far.
         # with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
-        with open(self.path + "/src/parameters.json", "r") as read_file:
+        with open(self.path + "/others/src/parameters.json", "r") as read_file:
             self.params = json.load(read_file)
 
         # Loads the model that we want to train, according to the config file
@@ -145,12 +145,12 @@ class Model():
                     train_error = train_error / nb_split_train
                     val_error = val_error / nb_split_val
 
-                    self.logs[0].append(epoch)
+                    self.logs[0].append(epoch+1)
                     self.logs[1].append(train_error)
                     self.logs[2].append(val_error)
 
                 self.model.train(True)
-                utils.waiting_bar(epoch, num_epochs, (self.logs[1][-1], self.logs[2][-1]))
+                utils.waiting_bar(epoch+1, num_epochs, (self.logs[1][-1], self.logs[2][-1]))
 
         # Save the model - path name contains the parameters + date
         date = datetime.now().strftime("%d%m%Y_%H%M%S")

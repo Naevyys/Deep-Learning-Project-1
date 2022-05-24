@@ -1,34 +1,5 @@
 import torch
 from torch import nn
-from torch.nn import functional as F
-# from src.utils import utils
-import json
-
-
-class TestNet(nn.Module):
-    """
-    Dummy network, without batchnorm, maxpool etc.
-    Just a test with two convolutions and one upsample. 
-    """
-
-    def __init__(self, params):
-        super().__init__()
-
-        self.img_ch = params["img_channel"]
-        self.h = params["height"]
-        self.w = params["width"]
-
-        self.conv1 = nn.Conv2d(self.img_ch, 6, kernel_size=5)
-        self.conv2 = nn.Conv2d(6, self.img_ch, kernel_size=5)
-        self.up = torch.nn.Upsample(size=[self.h, self.w], mode='nearest')
-        self.sig = torch.nn.Sigmoid()
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = self.up(x)
-        x = self.sig(x)
-        return x
 
 
 class Noise2noise(nn.Module):
@@ -56,7 +27,7 @@ class Noise2noise(nn.Module):
         self.dec_conv3b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv2a = nn.Conv2d(144, 96, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv2b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv1a = nn.Conv2d(96+self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1a = nn.Conv2d(96 + self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1b = nn.Conv2d(64, 32, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1 = nn.Conv2d(32, self.img_ch, kernel_size=3, stride=(1, 1), padding='same')
 
@@ -66,7 +37,6 @@ class Noise2noise(nn.Module):
         self.upscale2d = nn.Upsample(scale_factor=2, mode='nearest')
 
     def forward(self, x):
-
         skips = [x]
 
         x = self.lre(self.enc_conv0(x))
@@ -146,7 +116,7 @@ class Noise2noiseSimplified1(nn.Module):
         self.dec_conv3b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv2a = nn.Conv2d(144, 96, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv2b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv1a = nn.Conv2d(96+self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1a = nn.Conv2d(96 + self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1b = nn.Conv2d(64, 32, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1 = nn.Conv2d(32, self.img_ch, kernel_size=3, stride=(1, 1), padding='same')
 
@@ -156,7 +126,6 @@ class Noise2noiseSimplified1(nn.Module):
         self.upscale2d = nn.Upsample(scale_factor=2, mode='nearest')
 
     def forward(self, x):
-
         skips = [x]
 
         x = self.lre(self.enc_conv0(x))
@@ -226,7 +195,7 @@ class Noise2noiseSimplified2(nn.Module):
         self.dec_conv3b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv2a = nn.Conv2d(144, 96, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv2b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv1a = nn.Conv2d(96+self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1a = nn.Conv2d(96 + self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1b = nn.Conv2d(64, 32, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1 = nn.Conv2d(32, self.img_ch, kernel_size=3, stride=(1, 1), padding='same')
 
@@ -236,7 +205,6 @@ class Noise2noiseSimplified2(nn.Module):
         self.upscale2d = nn.Upsample(scale_factor=2, mode='nearest')
 
     def forward(self, x):
-
         skips = [x]
 
         x = self.lre(self.enc_conv0(x))
@@ -293,7 +261,7 @@ class Noise2noiseSimplified3(nn.Module):
         self.dec_conv3 = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv2a = nn.Conv2d(144, 96, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv2b = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv1a = nn.Conv2d(96+self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1a = nn.Conv2d(96 + self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1b = nn.Conv2d(64, 32, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1 = nn.Conv2d(32, self.img_ch, kernel_size=3, stride=(1, 1), padding='same')
 
@@ -303,7 +271,6 @@ class Noise2noiseSimplified3(nn.Module):
         self.upscale2d = nn.Upsample(scale_factor=2, mode='nearest')
 
     def forward(self, x):
-
         skips = [x]
 
         x = self.lre(self.enc_conv0(x))
@@ -348,7 +315,7 @@ class Noise2noiseSimplified4(nn.Module):
         self.enc_conv1 = nn.Conv2d(48, 48, kernel_size=3, stride=(1, 1), padding='same')
 
         self.dec_conv2 = nn.Conv2d(96, 96, kernel_size=3, stride=(1, 1), padding='same')
-        self.dec_conv1a = nn.Conv2d(96+self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
+        self.dec_conv1a = nn.Conv2d(96 + self.img_ch, 64, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1b = nn.Conv2d(64, 32, kernel_size=3, stride=(1, 1), padding='same')
         self.dec_conv1 = nn.Conv2d(32, self.img_ch, kernel_size=3, stride=(1, 1), padding='same')
 
@@ -358,7 +325,6 @@ class Noise2noiseSimplified4(nn.Module):
         self.upscale2d = nn.Upsample(scale_factor=2, mode='nearest')
 
     def forward(self, x):
-
         skips = [x]
 
         x = self.lre(self.enc_conv0(x))
@@ -377,4 +343,3 @@ class Noise2noiseSimplified4(nn.Module):
         x = self.hsig(self.dec_conv1(x))
 
         return x
-

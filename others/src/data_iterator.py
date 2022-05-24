@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import Dataset
-from torchvision.transforms import RandomAffine, ColorJitter
+from torchvision.transforms import ColorJitter
 from torchvision.transforms.functional import affine, adjust_brightness, adjust_contrast, adjust_saturation, adjust_hue
 
 

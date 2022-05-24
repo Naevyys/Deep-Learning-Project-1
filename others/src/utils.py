@@ -1,6 +1,6 @@
 import torch
-# import noise2noise as n2n
-from .noise2noise import TestNet, Noise2noise, Noise2noiseSimplified1, Noise2noiseSimplified2, Noise2noiseSimplified3, Noise2noiseSimplified4
+from .noise2noise import Noise2noise, Noise2noiseSimplified1, Noise2noiseSimplified2, Noise2noiseSimplified3, \
+    Noise2noiseSimplified4
 
 
 def to_cuda(x):
@@ -33,6 +33,7 @@ def get_optimizer(model, type="SGD", lr=None):
     else:
         raise Exception("Sorry, we could not find the optimizer.")
 
+
 # An interesting thing to develop would be a learning rate scheduler
 # Such that the lr decreases from 1 to 1e-2, 1e-4 etc. at certain epochs
 
@@ -56,17 +57,13 @@ def get_loss(type="L2"):
 
 
 def get_model(params):
-
     """
     Load the model to train. 
     :param params: A dictionary, the config file
     :return : A torch.nn.Module model
     """
     type = params["model"]
-
-    if type == "TestNet":
-        return TestNet(params)
-    elif type == "Noise2noise":
+    if type == "Noise2noise":
         return Noise2noise(params)
     elif type == "Noise2noiseSimplified1":
         return Noise2noiseSimplified1(params)
@@ -77,7 +74,7 @@ def get_model(params):
     elif type == "Noise2noiseSimplified4":
         return Noise2noiseSimplified4(params)
     else:
-         raise Exception("Sorry, we could not find any model corresponding to: "+params["model"])
+        raise Exception("Sorry, we could not find any model corresponding to: " + params["model"])
 
 
 def get_logs(path="../outputs/logs/TestNet_SGD_L2_0.01_64_16042022_023735.pth"):

@@ -8,9 +8,9 @@
     "img_channel": 3,
     "height": 32,
     "width": 32,
-    "path_model": "/outputs/trained_models/", 
-    "path_logs": "/outputs/logs/",
-    "best_model": "/outputs/trained_models/Noise2noiseSimplified4_ADA_HU_0.0075_64_22052022_022449.pth",
+    "path_model": "/others/outputs/trained_models/",
+    "path_logs": "/others/outputs/logs/",
+    "best_model": "/others/outputs/trained_models/Noise2noiseSimplified4_ADA_HU_0.0075_64_22052022_022449.pth",
     "validation": 0.2,
     "eval_step": 2
 }
