@@ -34,18 +34,12 @@ def get_optimizer(model, type="SGD", lr=None):
         raise Exception("Sorry, we could not find the optimizer.")
 
 
-# An interesting thing to develop would be a learning rate scheduler
-# Such that the lr decreases from 1 to 1e-2, 1e-4 etc. at certain epochs
-
-
 def get_loss(type="L2"):
     """
     Load the error/loss function. 
     :param type: A string, the error type
     :return : An error function that takes a prediction and target as input
     """
-    # Note according to the Noise2noise paper, the L2 and L1 norm are the simplest
-    # loss functions, see if we can do better. 
 
     if type == "L2":
         return torch.nn.MSELoss()

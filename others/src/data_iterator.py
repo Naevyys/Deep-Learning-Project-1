@@ -4,7 +4,7 @@ from torchvision.transforms import ColorJitter
 from torchvision.transforms.functional import affine, adjust_brightness, adjust_contrast, adjust_saturation, adjust_hue
 
 
-class RandomRotation2Img():
+class RandomRotation2Img:
 
     def __init__(self, prob):
         """
@@ -14,7 +14,7 @@ class RandomRotation2Img():
 
     def __call__(self, img1, img2):
         """
-        Applies the same random affine transformations to two images
+        Applies the same random rotation to two images with a given probability
         :param img1: First image
         :param img2: Second image
         :param prob: Probability of transformation
@@ -68,7 +68,7 @@ class ColorJitter2Img(ColorJitter):
         return transformed_img1, transformed_img2
 
 
-class StandardizeImg():
+class StandardizeImg:
     def __call__(self, img1, img2):
         """
         Standardize the tensor of images between 0 and 1.
@@ -89,23 +89,12 @@ class DataIterator(Dataset):
         :param imgs1: Tensor of first images.
         :param imgs2: Tensor of second images.
         :param prob: Probability of transformation.
-        :param degrees: Int or tuple of ints (range) for degrees of rotation.
-        :param translate: Tuple of values (range) for maximal translations. Values between 0 and 1.
-        :param scale: Tuple (range) giving scaling factor interval.
-        :param fill: Pixel value for areas outside transformed images.
         :param brightness: Float or tuple of floats (range). Non-negative.
         :param contrast: Float or tuple of floats (range). Non-negative.
         :param saturation: Float or tuple of floats (range). Non-negative.
         :param hue: Float or tuple of floats (range). Float between 0 and 0.5 or tuple with values between -0.5 and 0.5.
         :return: None
         """
-
-        # Notes:
-        # - No need to clean our data, since we have no useless or collinear features, or at most maybe color channels
-        # - No need to balance our data, since we do not classify anything
-        # - This iterator does not avoid loading everything into memory, since we first load the entire data, then
-        #   pass it to the interator
-
 
         assert isinstance(imgs1, torch.Tensor) and isinstance(imgs2, torch.Tensor), "Images must be tensors!"
         assert imgs1.size() == imgs2.size(), "Tensors of first and second images must have the same size!"
@@ -145,6 +134,7 @@ class DataIterator(Dataset):
             img1, img2 = self.rotation_transformer(img1, img2)
             img1, img2 = self.color_transformer(img1, img2)
         else:
+            # We iterate on the tensor to apply different transformations to each image
             for n in range(len(img1)):
                 img1[n], img2[n] = self.rotation_transformer(img1[n], img2[n])
                 img1[n], img2[n] = self.color_transformer(img1[n], img2[n])

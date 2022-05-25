@@ -61,27 +61,27 @@ class Noise2noise(nn.Module):
         x = self.lre(self.enc_conv6(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv5a(x))
         x = self.lre(self.dec_conv5b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv4a(x))
         x = self.lre(self.dec_conv4b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv3a(x))
         x = self.lre(self.dec_conv3b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv2a(x))
         x = self.lre(self.dec_conv2b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv1a(x))
         x = self.lre(self.dec_conv1b(x))
 
@@ -145,27 +145,27 @@ class Noise2noiseSimplified1(nn.Module):
         x = self.mp(x)
         skips.append(x)
 
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv5a(x))
         x = self.lre(self.dec_conv5b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv4a(x))
         x = self.lre(self.dec_conv4b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv3a(x))
         x = self.lre(self.dec_conv3b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv2a(x))
         x = self.lre(self.dec_conv2b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv1a(x))
         x = self.lre(self.dec_conv1b(x))
 
@@ -220,21 +220,21 @@ class Noise2noiseSimplified2(nn.Module):
         x = self.mp(x)
         skips.append(x)
 
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv4(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv3a(x))
         x = self.lre(self.dec_conv3b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv2a(x))
         x = self.lre(self.dec_conv2b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv1a(x))
         x = self.lre(self.dec_conv1b(x))
 
@@ -282,16 +282,16 @@ class Noise2noiseSimplified3(nn.Module):
         x = self.mp(x)
         skips.append(x)
 
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv3(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv2a(x))
         x = self.lre(self.dec_conv2b(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv1a(x))
         x = self.lre(self.dec_conv1b(x))
 
@@ -332,11 +332,11 @@ class Noise2noiseSimplified4(nn.Module):
         x = self.mp(x)
         skips.append(x)
 
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv2(x))
 
         x = self.upscale2d(x)
-        x = torch.concat([x, skips.pop()], dim=1)
+        x = torch.cat([x, skips.pop()], dim=1)
         x = self.lre(self.dec_conv1a(x))
         x = self.lre(self.dec_conv1b(x))
 

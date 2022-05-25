@@ -7,7 +7,6 @@ from .others.src import data_iterator as di
 import pathlib
 
 
-
 class Model():
     def __init__(self):
         """
@@ -17,9 +16,9 @@ class Model():
         # Due to miniproject 2, we need to correct these parameters
         torch.set_default_dtype(torch.float32)
         torch.set_grad_enabled(True)
+
         self.path = str(pathlib.Path(__file__).parent.resolve())
-        # Not very pretty in constructor, but best solution so far.
-        # with open("Proj_287452_337635_288228/Miniproject_1/src/parameters.json", "r") as read_file:
+        # Best solution so far
         with open(self.path + "/others/src/parameters.json", "r") as read_file:
             self.params = json.load(read_file)
 
@@ -41,7 +40,7 @@ class Model():
         # Make sure that the model can be loaded whether it was trained on CPU or GPU 
         self.model.load_state_dict(
             torch.load(self.path + self.params["best_model"], map_location=lambda storage, loc: storage))
-        self.model.eval() 
+        self.model.eval()
 
     def train(self, train_input, train_target, num_epochs=None):
         """
@@ -57,7 +56,6 @@ class Model():
 
         # Custom train/validation split - Start by shuffling and sending to GPU is available
         idx = torch.randperm(train_input.size()[0])
-
         train_input = train_input[idx, :, :, :]
         train_target = train_target[idx, :, :, :]
         # Then take the last images as validation set (w.r.t. proportion)
@@ -71,7 +69,7 @@ class Model():
         # Data augmentation
 
         # Parameters for augmentation
-        probability = 0.5
+        probability = 0.5  # Probability to undergo an augmentation
         brightness = (0.9, 1)
         contrast = (0.7, 1)
         saturation = (0.5, 1)
@@ -81,21 +79,21 @@ class Model():
                                     brightness=brightness, contrast=contrast, saturation=saturation, hue=hue)
 
         train_input_augmented, train_target_augmented = data_iter[:]
-
         nb_images_train = len(data_iter)
         nb_images_val = len(val_input)
-
-        # Set the model in train mode
-        self.model.train(True)
 
         # Initialize optimizer
         optimizer = utils.get_optimizer(self.model, self.params["opti_type"], self.params["lr"])
 
         # The error function
         criterion = utils.get_loss(self.params["error"])
+
         # Maximum number of epochs/iterations
         if num_epochs is None:
             num_epochs = self.params["max_epochs"]
+
+        # Set the model in train mode
+        self.model.train(True)
 
         # The loop on the epochs
         for epoch in range(0, num_epochs):
@@ -145,20 +143,20 @@ class Model():
                     train_error = train_error / nb_split_train
                     val_error = val_error / nb_split_val
 
-                    self.logs[0].append(epoch+1)
+                    self.logs[0].append(epoch + 1)
                     self.logs[1].append(train_error)
                     self.logs[2].append(val_error)
 
                 self.model.train(True)
-                utils.waiting_bar(epoch+1, num_epochs, (self.logs[1][-1], self.logs[2][-1]))
+                utils.waiting_bar(epoch + 1, num_epochs, (self.logs[1][-1], self.logs[2][-1]))
 
         # Save the model - path name contains the parameters + date
         date = datetime.now().strftime("%d%m%Y_%H%M%S")
         path = self.params["model"] + "_" + self.params["opti_type"] \
                + "_" + str(self.params["error"]) + "_" + str(self.params["lr"]) + "_" + str(
             self.params["batch_size"]) + "_" + date + ".pth"
-
         torch.save(self.model.state_dict(), self.path + self.params["path_model"] + path)
+
         # Save the logs as well
         self.logs = torch.tensor(self.logs)
         torch.save(self.logs, self.path + self.params["path_logs"] + path)
@@ -191,4 +189,4 @@ class Model():
         """
 
         assert denoised.shape == ground_truth.shape, "Denoised image and ground truth must have the same shape!"
-        return - 10 * torch.log10(((denoised-ground_truth) ** 2).mean((1, 2, 3))).mean()
+        return - 10 * torch.log10(((denoised - ground_truth) ** 2).mean((1, 2, 3))).mean()
